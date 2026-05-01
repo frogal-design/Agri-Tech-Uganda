@@ -5,265 +5,432 @@ import {
   TrendingUp, 
   Megaphone as Ads, 
   Smartphone as USSD,
-  Send
+  Search,
+  Languages,
+  PlusSquare,
+  ChevronRight,
+  TrendingDown,
+  Minus,
+  Phone,
+  SignalHigh,
+  BatteryFull,
+  ArrowLeft,
+  Menu,
+  Verified
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-const farmerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAHtq6Z8pAMAF0VqKFq7N4YSkUdk3xCXT5jnzsLIel7EwAhufk0k-mi5bMQmJuDKkWmO68pI8doPV4cwOPZ0TC2JynEUOF758A_I269ZA5irqRmnFKqB-LQ93RyHcrxozZbpISxkL1lxAVDZYh3FcAlU5MOIk9bIo5-qj36ofRGjO8fjgvlyQdUfXSkuZHelWjDdjhRno_q51JLbItWtyFVUZ9AETVU5sPB4YN3BWsvPpwqzDtJXN9PBrG_i_VF6xAqrQRc-KDw0ZVJ";
+const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
+const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
+const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qYFfsS7J-Jr26daBwCALYk9cN1C1dKSSLaJnMxviFJ74NgDnxKLFLTkjjhmOzj5U-Whcxj8WxyK8cybSwWw3yWMDc-Xq35WFhQ51CSWzvP7VpMP3qoeB81susixmbszkj_4FKhQRS5-8UhWAjdLcd5Mix7aIglI8G_hy-1Cp12Ffa0NIEFaMbFtcEy2vReV3hwSNE4UNsgESQwSD8kbq9s8jpQHrqTDOXeU9lGWF_XOQHw_ue62RNMPSJnoxaQ5aim_q86a";
+const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
+const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
-  const [step1Value, setStep1Value] = useState('1');
-  const [step2Value, setStep2Value] = useState('');
 
   const marketPrices = [
-    { name: 'Maize', price: '1,200', unit: 'kg', trend: 'up' },
-    { name: 'Beans (Nambale)', price: '3,500', unit: 'kg', trend: 'stable' },
-    { name: 'Coffee (Robusta)', price: '7,800', unit: 'kg', trend: 'up' },
-    { name: 'Matooke', price: '15,000', unit: 'bunch', trend: 'down' },
-    { name: 'Cassava', price: '800', unit: 'kg', trend: 'stable' },
+    { date: '24/10/23', market: 'KAMPALA (OWINO)', variety: 'Maize Grain (White)', grade: 'G1', price: '1,250', change: '+4.2%', trend: 'up' },
+    { date: '24/10/23', market: 'MBALE', variety: 'Supa Rice', grade: 'G1', price: '3,800', change: '-1.5%', trend: 'down' },
+    { date: '24/10/23', market: 'MASAKA', variety: 'Beans (Nambale)', grade: 'G2', price: '2,400', change: '0.0%', trend: 'stable' },
+    { date: '23/10/23', market: 'GULU', variety: 'Cassava Chips', grade: 'G1', price: '850', change: '+12.0%', trend: 'up' },
+    { date: '23/10/23', market: 'KAMPALA (KASE)', variety: 'Soy Beans', grade: 'G1', price: '2,100', change: '-3.2%', trend: 'down' },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen pb-24">
-      {/* Header */}
-      <header className="bg-white border-b-2 border-black flex justify-between items-center px-4 h-14 sticky top-0 z-50">
-        <div className="text-xl font-display font-black uppercase tracking-wider text-black">
-          AGRI-TECH UGANDA
+    <div className="flex flex-col min-h-screen">
+      {/* TopAppBar */}
+      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-4 h-16 bg-white border-b-2 border-black">
+        <div className="flex items-center gap-4">
+          <span className="text-xl font-display font-black tracking-tighter uppercase text-black">AGRI-PULSE UG</span>
         </div>
-        <div className="flex gap-4">
-          <button className="p-1 hover:bg-primary hover:text-white transition-colors border-2 border-transparent hover:border-black active:translate-y-0.5">
-            <User size={20} />
+        <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center border-2 border-black bg-white px-3 h-10">
+            <Search size={18} className="text-black" />
+            <input className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
+          </div>
+          <button className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+            <Languages size={20} className="text-black" />
           </button>
-          <button className="p-1 hover:bg-primary hover:text-white transition-colors border-2 border-transparent hover:border-black active:translate-y-0.5">
-            <Settings size={20} />
+          <button className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+            <User size={20} className="text-black" />
           </button>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto w-full p-4 mt-6">
+      <main className="pt-24 pb-28 px-4 md:px-8 max-w-7xl mx-auto w-full">
         <AnimatePresence mode="wait">
           {activeTab === 'ussd' ? (
-            <motion.div
+            <motion.div 
               key="ussd"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="grid grid-cols-1 md:grid-cols-12 gap-8"
             >
-              {/* Title Section */}
-              <div className="mb-10 border-l-8 border-primary pl-4">
-                <h1 className="font-display text-4xl font-bold uppercase">USSD System Terminal</h1>
-                <p className="text-xl mt-2 text-gray-600">Real-time simulation of the offline farmer gateway.</p>
+              <div className="md:col-span-12 mb-8">
+                <h1 className="font-display text-5xl font-black uppercase text-black leading-none mb-4 tracking-tighter italic">USSD SIMULATOR</h1>
+                <p className="text-xl text-gray-700 max-w-2xl font-medium">
+                  Test and preview the offline accessibility interface for AGRI-PULSE. Designed for low-connectivity environments with high-contrast accessibility.
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-                {/* Step 1: Language Selection */}
-                <section className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-secondary-container text-black font-mono text-xs font-bold px-2 py-1 border-2 border-black">STEP 01</span>
-                    <h2 className="font-display text-xl font-bold uppercase">Language Init</h2>
-                  </div>
-                  
-                  <div className="ussd-card">
-                    <div className="ussd-terminal-header">
-                      <span>NETWORK: AIRTEL UG</span>
-                      <span>*135#</span>
-                    </div>
-                    <div className="font-mono text-lg border-b border-black/10 py-4 mb-4">
-                      <p className="mb-2">Welcome to Agri-Tech Uganda.</p>
-                      <p>Select Language:</p>
-                      <ul className="mt-2 space-y-1">
-                        <li>1. English</li>
-                        <li>2. Swahili</li>
-                        <li>3. Luganda</li>
-                        <li>4. Luo</li>
-                      </ul>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-grow bg-gray-100 border-2 border-black px-3 h-12 flex items-center font-mono">
-                        <span className="text-black">{step1Value}</span>
-                        <div className="ml-1 w-2 h-6 bg-primary animate-pulse" />
+              {/* Simulator Interface (Left) */}
+              <div className="md:col-span-5 flex justify-center items-start">
+                <div className="relative w-full max-w-[360px] aspect-[9/18] bg-black rounded-[40px] p-4 border-[6px] border-black neo-shadow">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-10"></div>
+                  <div className="w-full h-full bg-[#f3f3f3] rounded-[24px] overflow-hidden flex flex-col border-2 border-black">
+                    <div className="flex justify-between items-center px-6 py-4 border-b border-black/10">
+                      <span className="font-mono text-[10px] font-bold">AGRI-NET UG</span>
+                      <div className="flex gap-1 items-center">
+                        <SignalHigh size={12} />
+                        <BatteryFull size={12} />
                       </div>
-                      <button className="bg-primary px-6 h-12 text-white font-display font-bold border-2 border-black hover:bg-black transition-colors flex items-center gap-2 font-black uppercase">
-                        <span>SEND</span>
-                      </button>
+                    </div>
+                    <div className="flex-grow p-6 flex flex-col">
+                      <div className="mb-4 bg-black text-accent p-2 inline-block self-start font-mono text-[10px] font-bold uppercase">
+                        DIALING *135#...
+                      </div>
+                      <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <ul className="text-xs space-y-2 uppercase">
+                          <li>1. Market Prices</li>
+                          <li>2. Post Advertisement</li>
+                          <li>3. Crop Diseases</li>
+                          <li>4. Weather Forecast</li>
+                          <li>5. Account Settings</li>
+                          <li>6. Help / Feedback</li>
+                        </ul>
+                        <div className="mt-8">
+                          <div className="border-b-2 border-black w-full h-8 flex items-center">
+                            <span className="animate-pulse">|</span>
+                          </div>
+                          <div className="flex justify-between mt-2">
+                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
+                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-16 border-t-2 border-black flex items-center justify-around bg-white">
+                      <ArrowLeft size={20} className="text-black" />
+                      <div className="w-10 h-10 border-2 border-black rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-black rounded-sm"></div>
+                      </div>
+                      <Menu size={20} className="text-black" />
                     </div>
                   </div>
-                </section>
-
-                {/* Step 2: Main Menu */}
-                <section className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-secondary-container text-black font-mono text-xs font-bold px-2 py-1 border-2 border-black">STEP 02</span>
-                    <h2 className="font-display text-xl font-bold uppercase">Service Menu</h2>
-                  </div>
-                  
-                  <div className="ussd-card">
-                    <div className="ussd-terminal-header">
-                      <span>NETWORK: AIRTEL UG</span>
-                      <span>SESSION: 22891</span>
-                    </div>
-                    <div className="font-mono text-lg border-b border-black/10 py-4 mb-4">
-                      <p className="mb-2 text-primary font-bold">AGRI-TECH MAIN MENU</p>
-                      <ul className="space-y-1">
-                        <li>1. Market Prices</li>
-                        <li>2. Advertise</li>
-                        <li>3. Crop Diseases</li>
-                        <li>4. New Agritech</li>
-                        <li>5. Expert Opinions</li>
-                        <li className="pt-2 text-gray-500">0. Back</li>
-                      </ul>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="text"
-                        placeholder="Enter choice..."
-                        className="flex-grow bg-gray-100 border-2 border-black px-3 h-12 font-mono outline-none focus:ring-0"
-                        value={step2Value}
-                        onChange={(e) => setStep2Value(e.target.value)}
-                      />
-                      <button className="bg-primary px-6 h-12 text-white font-display font-bold border-2 border-black hover:bg-black transition-colors font-black uppercase">
-                        SEND
-                      </button>
-                    </div>
-                  </div>
-                </section>
+                </div>
               </div>
 
-              {/* Infrastructure Status */}
-              <section className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-[#dee3e8] border-2 border-black p-4">
-                  <p className="text-xs font-bold uppercase text-gray-600 mb-1">Bandwidth</p>
-                  <p className="font-display text-2xl font-bold uppercase">2G/EDGE</p>
-                  <div className="mt-2 h-2 bg-stone-300">
-                    <div className="bg-secondary h-full w-[15%]"></div>
+              {/* Documentation & Steps (Right) */}
+              <div className="md:col-span-7 space-y-8">
+                <div className="bg-white border-2 border-black p-6 neo-shadow">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="bg-black text-white w-12 h-12 flex items-center justify-center font-display text-2xl font-black">01</div>
+                    <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
-                  <p className="text-[10px] mt-1 font-mono uppercase">Optimized for low signal</p>
-                </div>
-
-                <div className="bg-secondary-container border-2 border-black p-4">
-                  <p className="text-xs font-bold uppercase text-gray-800 mb-1">Active Users</p>
-                  <p className="font-display text-2xl font-bold uppercase">12,482</p>
-                  <p className="text-[10px] mt-1 font-mono uppercase">Rural Uganda Reach</p>
-                </div>
-
-                <div className="bg-primary-container border-2 border-black p-4">
-                  <p className="text-xs font-bold uppercase text-gray-800 mb-1">Uptime</p>
-                  <p className="font-display text-2xl font-bold uppercase text-black">99.9%</p>
-                  <p className="text-[10px] mt-1 font-mono uppercase text-black/80 font-bold">SMS/USSD Gateway Active</p>
-                </div>
-              </section>
-
-              {/* Visual Context */}
-              <section className="mt-12">
-                <div className="border-2 border-black bg-white overflow-hidden ussd-shadow">
-                  <div className="bg-primary text-white font-display font-bold p-3 border-b-2 border-black tracking-widest text-center uppercase">
-                    Field Impact Data
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2">
-                    <div className="p-4 border-r-0 md:border-r-2 border-black flex items-center justify-center bg-gray-50">
-                      <img 
-                        className="w-full h-80 object-cover border-2 border-black grayscale hover:grayscale-0 transition-all duration-700 cursor-pointer" 
-                        src={farmerImage}
-                        alt="Ugandan farmer in field"
-                      />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
+                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
                     </div>
-                    <div className="p-8 bg-stone-50 flex flex-col justify-center">
-                      <h3 className="font-display text-2xl font-bold mb-4 uppercase">Bridging the Gap</h3>
-                      <p className="text-lg mb-6 leading-relaxed">
-                        Agri-Tech Uganda's USSD interface provides critical market data and disease diagnostics even without internet connectivity. Our brutalist design ensures readability under harsh sunlight for farmers across the region.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="bg-tertiary-container text-black font-bold text-xs px-3 py-1 border-2 border-black uppercase italic">Offline First</span>
-                        <span className="bg-tertiary-container text-black font-bold text-xs px-3 py-1 border-2 border-black uppercase italic">USSD Gateway</span>
-                        <span className="bg-tertiary-container text-black font-bold text-xs px-3 py-1 border-2 border-black uppercase italic">Real-Time Data</span>
-                      </div>
+                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
+                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
+                    </div>
+                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
+                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
+                    </div>
+                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
+                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="border-2 border-black bg-white p-4">
+                    <TrendingUp className="mb-2 block text-black" size={24} />
+                    <h4 className="font-bold uppercase mb-2 tracking-widest text-sm">Market Prices</h4>
+                    <p className="text-xs text-gray-600">Get real-time wholesale and retail prices for 50+ crops across 15 districts.</p>
+                  </div>
+                  <div className="border-2 border-black bg-accent p-4">
+                    <Ads className="mb-2 block text-black" size={24} />
+                    <h4 className="font-bold uppercase mb-2 tracking-widest text-sm">Advertise</h4>
+                    <p className="text-xs text-gray-800 font-medium">Post produce for sale directly from the field via simple numeric input.</p>
+                  </div>
+                </div>
+
+                <div className="bg-primary text-white p-6 border-2 border-black neo-shadow">
+                  <h4 className="font-bold uppercase text-accent mb-4 tracking-[0.2em] italic">DEBUG CONSOLE</h4>
+                  <div className="font-mono text-xs space-y-1 opacity-80">
+                    <p>&gt; SESSION_START ID: 98221-UA</p>
+                    <p>&gt; POLLING GSM_NETWORK: OK</p>
+                    <p>&gt; HANDSHAKE *135#: SUCCESS</p>
+                    <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
+                  </div>
+                  <div className="mt-6 flex gap-4">
+                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
+                    <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
+                  </div>
+                </div>
+              </div>
+
+              <section className="md:col-span-12 my-8">
+                <div className="relative h-[400px] border-2 border-black overflow-hidden group neo-shadow">
+                  <img alt="Farmer in Uganda" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src={farmerHandImage} />
+                  <div className="absolute inset-0 bg-black/40 flex items-end p-8">
+                    <div className="bg-white border-2 border-black p-6 max-w-lg">
+                      <h2 className="font-display text-3xl font-black uppercase mb-4 tracking-tighter">Bridging the Connectivity Gap</h2>
+                      <p className="text-lg font-medium text-gray-700">Even without a smartphone, every farmer is connected. AGRI-PULSE USSD ensures no data is left behind, turning every basic handset into a powerful agricultural terminal.</p>
                     </div>
                   </div>
                 </div>
               </section>
             </motion.div>
-          ) : activeTab === 'prices' ? (
-            <motion.div
-              key="prices"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+          ) : activeTab === 'ads' ? (
+            <motion.div 
+              key="ads"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
             >
-              <div className="mb-10 border-l-8 border-secondary pl-4">
-                <h1 className="font-display text-4xl font-bold uppercase">Real-Time Market Prices</h1>
-                <p className="text-xl mt-2 text-gray-600">Wholesale commodity prices across major Uganda markets.</p>
-              </div>
+              <section className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-2 border-black pb-8">
+                <div className="space-y-2">
+                  <h1 className="font-display text-5xl font-black uppercase tracking-tighter italic">Advertisements</h1>
+                  <p className="text-xl text-gray-600 max-w-xl font-medium">
+                    High-precision trade portal for Ugandan agribusiness. Direct equipment sales, seed distribution, and expert livestock listings.
+                  </p>
+                </div>
+                <button className="neo-button flex items-center gap-2 h-14">
+                  <PlusSquare size={20} />
+                  <span>Post an Ad</span>
+                </button>
+              </section>
 
-              <div className="grid grid-cols-1 gap-6">
-                <div className="bg-primary text-white p-4 border-2 border-black font-display font-bold uppercase tracking-widest flex justify-between">
-                  <span>Commodity</span>
-                  <div className="flex gap-20">
-                    <span>Unit</span>
-                    <span className="w-32 text-right">Price (UGX)</span>
+              <section className="flex flex-wrap gap-4 mb-12">
+                <button className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest">All Listings</button>
+                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Tractors</button>
+                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Irrigation</button>
+                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Fertilizer</button>
+                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Livestock</button>
+              </section>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div className="md:col-span-8 border-2 border-black bg-white group overflow-hidden neo-shadow">
+                  <div className="relative h-64 md:h-96 border-b-2 border-black overflow-hidden">
+                    <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src={tractorImage} alt="Large tractor" />
+                    <div className="absolute top-4 left-4 bg-accent border-2 border-black px-4 py-2 font-black uppercase text-xs">Featured</div>
+                  </div>
+                  <div className="p-8 grid md:grid-cols-2 gap-8">
+                    <div>
+                      <h3 className="font-display text-3xl font-black uppercase mb-4 tracking-tighter">John Deere 5075E 4WD</h3>
+                      <p className="text-gray-600 font-medium">2023 Model, only 120 hours. Specialized for large-scale maize production. Full service history included.</p>
+                    </div>
+                    <div className="flex flex-col justify-between items-end">
+                      <span className="font-display text-3xl font-black text-black">UGX 145,000,000</span>
+                      <div className="flex gap-2 w-full mt-6">
+                        <button className="flex-1 border-2 border-black h-12 font-black uppercase hover:bg-black hover:text-white transition-colors">Details</button>
+                        <button className="flex-1 bg-black text-white border-2 border-black h-12 font-black uppercase hover:bg-accent hover:text-black transition-colors">Contact</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                {marketPrices.map((item, index) => (
-                  <motion.div 
-                    key={item.name}
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-white border-2 border-black p-4 flex justify-between items-center group hover:bg-secondary-container transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-3 h-3 border-2 border-black ${item.trend === 'up' ? 'bg-error' : item.trend === 'down' ? 'bg-secondary' : 'bg-gray-400'}`} />
-                      <span className="text-xl font-bold font-display uppercase italic">{item.name}</span>
+
+                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow">
+                  <div className="h-64 border-b-2 border-black overflow-hidden">
+                    <img className="w-full h-full object-cover" src={pumpImage} alt="Solar pump" />
+                  </div>
+                  <div className="p-6 flex-grow flex flex-col justify-between">
+                    <div>
+                      <span className="text-xs uppercase font-black text-gray-500 tracking-[0.2em]">Irrigation</span>
+                      <h3 className="font-display text-2xl font-black uppercase mt-2 tracking-tighter leading-none">Solar Water Pump 5HP</h3>
+                      <p className="text-sm text-gray-600 mt-4 font-medium">Complete kit with panels and 200m hose. High efficiency for dry season.</p>
                     </div>
-                    <div className="flex items-center gap-20">
-                      <span className="font-mono text-gray-600">Per {item.unit}</span>
-                      <span className="w-32 text-right text-2xl font-black font-mono">{item.price}</span>
+                    <div className="mt-8 pt-6 border-t-2 border-black flex justify-between items-center">
+                      <span className="font-black text-xl">UGX 4,200,000</span>
+                      <button className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-accent transition-colors"><ChevronRight size={24} /></button>
                     </div>
-                  </motion.div>
-                ))}
+                  </div>
+                </div>
+
+                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow">
+                  <div className="p-4 border-b-2 border-black bg-gray-50 flex justify-between items-center">
+                    <span className="text-xs uppercase font-black tracking-widest">Seed Supplies</span>
+                    <Verified size={20} className="text-sky-blue" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-display text-2xl font-black uppercase mb-2 tracking-tighter">Hybrid Maize Longe 10H</h3>
+                    <p className="text-sm text-gray-600 mb-6 font-medium">Certified seeds, 50kg bags. High yield resistance to local pests. In stock in Kampala.</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-xl">UGX 350,000 <span className="text-xs font-normal text-gray-500">/ bag</span></span>
+                      <button className="border-2 border-black px-6 py-2 font-black uppercase text-xs hover:bg-black hover:text-white transition-colors">Order</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow">
+                  <div className="h-48 border-b-2 border-black overflow-hidden bg-black flex items-center justify-center">
+                    <Ads size={64} className="text-accent" />
+                  </div>
+                  <div className="p-6 flex-grow">
+                    <h3 className="font-display text-2xl font-black uppercase mb-2 tracking-tighter">Wanted: Grain Dryer</h3>
+                    <p className="text-sm text-gray-600 mb-6 font-medium">Looking for a used industrial grain dryer for cocoa processing. Must be 5-ton capacity.</p>
+                    <div className="bg-accent border-2 border-black p-4 flex items-center gap-4">
+                      <Phone size={20} />
+                      <span className="font-black uppercase text-xs tracking-wider">Call Buyer: +256 702...</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow grayscale opacity-70">
+                  <div className="h-48 border-b-2 border-black overflow-hidden relative">
+                    <img className="w-full h-full object-cover" src={fertilizerImage} alt="Fertilizer" />
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white font-black uppercase text-xl border-2 border-white p-4 tracking-tighter">Sold Out</span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-display text-2xl font-black uppercase mb-2 tracking-tighter">NPK 17-17-17 Bulk</h3>
+                    <p className="text-sm text-gray-500 font-medium">Last batch was cleared on Nov 12. Check back for next delivery.</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : activeTab === 'prices' ? (
+            <motion.div 
+              key="prices"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+            >
+              <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="border-2 border-black p-6 bg-accent neo-shadow">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] mb-2">Market Insight</p>
+                  <h2 className="font-display text-2xl font-black uppercase tracking-tighter leading-tight italic">Maize prices are rising in Kampala markets.</h2>
+                </div>
+                <div className="border-2 border-black p-6 bg-white neo-shadow">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-2">Last Update</p>
+                  <h2 className="font-display text-2xl font-black uppercase tracking-tighter leading-tight">Oct 24, 2023 - 09:00 EAT</h2>
+                </div>
+                <div className="border-2 border-black p-6 bg-sky-blue text-white neo-shadow">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] opacity-80 mb-2">Top Variety</p>
+                  <h2 className="font-display text-2xl font-black uppercase tracking-tighter leading-tight italic">Supa Rice (Grade 1)</h2>
+                </div>
               </div>
 
-              <div className="mt-12 bg-gray-100 border-2 border-black p-6 border-dashed">
-                <p className="font-mono text-sm text-center text-gray-500 italic">
-                  Data sourced from Ministry of Agriculture, Animal Industry and Fisheries (MAAIF). Updates hourly.
-                </p>
+              <section className="border-2 border-black bg-white overflow-hidden neo-shadow">
+                <div className="p-6 border-b-2 border-black bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <h1 className="font-display text-3xl font-black uppercase tracking-tighter italic">Wholesale Market Prices</h1>
+                  <div className="w-full md:w-auto flex items-center border-2 border-black bg-white px-4 h-12">
+                    <Search size={20} className="text-gray-400 mr-3" />
+                    <input className="border-none focus:ring-0 w-full md:w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-primary text-white border-b-2 border-black font-display font-black uppercase tracking-wider text-xs italic">
+                        <th className="p-4 border border-black/20">Date</th>
+                        <th className="p-4 border border-black/20">Market</th>
+                        <th className="p-4 border border-black/20">Variety</th>
+                        <th className="p-4 border border-black/20">Grade</th>
+                        <th className="p-4 border border-black/20 text-right">Price (UGX)</th>
+                        <th className="p-4 border border-black/20 text-center">Change</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm font-medium">
+                      {marketPrices.map((row, i) => (
+                        <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-accent/10 transition-colors`}>
+                          <td className="p-4 border border-black/10 font-mono text-xs">{row.date}</td>
+                          <td className="p-4 border border-black/10 font-black uppercase italic">{row.market}</td>
+                          <td className="p-4 border border-black/10">{row.variety}</td>
+                          <td className="p-4 border border-black/10 text-center">
+                            <span className="bg-secondary-container px-2 py-0.5 border border-black font-black text-[10px]">{row.grade}</span>
+                          </td>
+                          <td className="p-4 border border-black/10 text-right font-black font-mono text-lg">{row.price}</td>
+                          <td className="p-4 border border-black/10">
+                            <div className={`flex items-center justify-center gap-1 font-black italic ${row.trend === 'up' ? 'text-red-600' : row.trend === 'down' ? 'text-green-600' : 'text-gray-400'}`}>
+                              {row.trend === 'up' ? <TrendingUp size={14} /> : row.trend === 'down' ? <TrendingDown size={14} /> : <Minus size={14} />}
+                              <span>{row.change}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="p-6 bg-gray-50 flex justify-center items-center gap-8 border-t-2 border-black">
+                  <button className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">PREVIOUS</button>
+                  <span className="font-black italic tracking-widest text-sm">PAGE 1 OF 12</span>
+                  <button className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">NEXT</button>
+                </div>
+              </section>
+
+              <div className="mt-12 border-2 border-black overflow-hidden grid grid-cols-1 md:grid-cols-2 neo-shadow">
+                <div className="p-10 flex flex-col justify-center bg-white">
+                  <h3 className="font-display text-4xl font-black uppercase tracking-tighter italic mb-6">Why data matters?</h3>
+                  <p className="text-lg font-medium text-gray-600 mb-8 leading-relaxed">
+                    Accurate market information helps you negotiate better prices at the farm gate. Our data is updated daily from major hubs across Uganda.
+                  </p>
+                  <button className="bg-sky-blue text-white border-2 border-black py-4 font-display font-black uppercase tracking-[0.2em] hover:bg-black transition-all active:translate-y-1">
+                    GET SMS ALERTS
+                  </button>
+                </div>
+                <div className="h-80 md:h-auto min-h-[400px] relative">
+                  <img alt="Ugandan Market" className="absolute inset-0 w-full h-full object-cover grayscale" src={marketImage} />
+                </div>
               </div>
             </motion.div>
           ) : (
-            <motion.div
-              key="ads"
+            <motion.div 
+              key="profile"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center justify-center h-64"
+              className="flex items-center justify-center h-96 border-4 border-dashed border-black/20"
             >
-              <p className="font-display text-2xl font-bold uppercase">Coming Soon: Merchant Portal</p>
+              <div className="text-center italic">
+                <User size={64} className="mx-auto mb-4 opacity-20" />
+                <p className="font-display text-3xl font-black uppercase text-black/20">Farmer Profile View coming soon</p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-stretch h-20 bg-white border-t-2 border-black font-display text-xs font-black uppercase">
+      <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
           onClick={() => setActiveTab('prices')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r border-black transition-colors ${activeTab === 'prices' ? 'bg-black text-white' : 'hover:bg-gray-100'}`}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
-          <TrendingUp className="mb-1" size={24} />
-          <span>Prices</span>
+          <TrendingUp size={24} className={activeTab === 'prices' ? 'fill-black' : ''} />
+          <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
           onClick={() => setActiveTab('ads')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r border-black transition-colors ${activeTab === 'ads' ? 'bg-black text-white' : 'hover:bg-gray-100'}`}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
-          <Ads className="mb-1" size={24} />
-          <span>Ads</span>
+          <Ads size={24} className={activeTab === 'ads' ? 'fill-black' : ''} />
+          <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
           onClick={() => setActiveTab('ussd')}
-          className={`flex flex-col items-center justify-center w-full h-full transition-colors ${activeTab === 'ussd' ? 'bg-primary text-white' : 'hover:bg-gray-100 text-black'}`}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
-          <USSD className="mb-1" size={24} />
-          <span>USSD</span>
+          <USSD size={24} className={activeTab === 'ussd' ? 'fill-black' : ''} />
+          <span className="font-display text-[10px] font-black uppercase mt-1">USSD</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab('profile')}
+          className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+        >
+          <User size={24} className={activeTab === 'profile' ? 'fill-black' : ''} />
+          <span className="font-display text-[10px] font-black uppercase mt-1">Profile</span>
         </button>
       </nav>
     </div>

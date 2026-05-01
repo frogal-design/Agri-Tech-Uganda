@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Lexend:wght@300..700&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..900&family=Lexend:wght@300..700&family=JetBrains+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -6,31 +6,34 @@
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  --color-primary: #00668a;
-  --color-primary-container: #00bfff;
-  --color-secondary: #4b6700;
+  --color-primary: #000000;
+  --color-accent: #DFFF00;
+  --color-primary-container: #1b1b1b;
+  --color-sky-blue: #00668a;
   --color-secondary-container: #b6f300;
   --color-tertiary-container: #fb9c24;
-  --color-surface: #f5faff;
-  --color-on-background: #161c20;
+  --color-surface: #f9f9f9;
+  --color-on-background: #1a1c1c;
 }
 
 @layer base {
   body {
     @apply bg-surface text-on-background font-sans min-h-screen;
+    background-image: linear-gradient(#e2e2e2 1px, transparent 1px), linear-gradient(90deg, #e2e2e2 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 }
 
 @layer components {
-  .ussd-border {
-    @apply border-2 border-black;
-  }
-  
-  .ussd-shadow {
+  .neo-shadow {
     box-shadow: 4px 4px 0px 0px #000;
   }
 
-  /* Define complex components directly without nested custom @apply */
+  .neo-button {
+    @apply border-2 border-black bg-accent text-black font-display font-black uppercase px-6 py-2 transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+
   .ussd-terminal-header {
     @apply bg-black text-white p-2 font-mono text-xs flex justify-between uppercase border-2 border-black;
   }
@@ -38,6 +41,10 @@
   .ussd-card {
     @apply bg-white border-2 border-black p-4;
     box-shadow: 4px 4px 0px 0px #000;
+  }
+
+  .lemon-table-border {
+    @apply border border-black;
   }
 }
 
