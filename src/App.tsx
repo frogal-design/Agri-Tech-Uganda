@@ -54,6 +54,8 @@ export default function App() {
   useEffect(() => {
     fetchInitialData();
     
+    if (!supabase) return;
+
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
@@ -74,6 +76,10 @@ export default function App() {
   }, []);
 
   const fetchInitialData = async () => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const [adsRes, pricesRes] = await Promise.all([
@@ -105,6 +111,10 @@ export default function App() {
 
   const handlePostAd = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      alert('Postings are disabled because Supabase is not configured.');
+      return;
+    }
     if (!newAd.title || !newAd.description || !newAd.contact) return;
 
     try {
@@ -135,6 +145,11 @@ export default function App() {
       <header className="fixed top-0 w-full z-50 flex justify-between items-center px-4 h-16 bg-white border-b-2 border-black">
         <div className="flex items-center gap-4">
           <span className="text-xl font-display font-black tracking-tighter uppercase text-black">AGRI-PULSE UG</span>
+          {!supabase && (
+             <div className="hidden md:flex items-center gap-2 bg-red-100 border border-red-500 px-2 py-0.5 rounded text-[10px] font-black uppercase text-red-600 animate-pulse">
+               Missing Supabase Configuration
+             </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center border-2 border-black bg-white px-3 h-10">

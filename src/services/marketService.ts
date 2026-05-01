@@ -2,10 +2,22 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { supabase } from "../lib/supabase";
 import { MarketPrice } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAI() {
+  if (!aiInstance) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey === 'MY_GEMINI_API_KEY' || apiKey === 'undefined' || apiKey === '') {
+      throw new Error('GEMINI_API_KEY is missing. Please set VITE_GEMINI_API_KEY in your environment variables.');
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+}
 
 export async function refreshMarketPrices(): Promise<MarketPrice[]> {
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: "Search for the latest agricultural market prices in Uganda (Kampala, Mbarara, Gulu, etc.) for common crops. Return a JSON array of objects with fields: market, variety, grade, price, change, and trend ('up', 'down', 'stable').",
