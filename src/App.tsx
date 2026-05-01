@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   Settings, 
@@ -16,9 +16,13 @@ import {
   BatteryFull,
   ArrowLeft,
   Menu,
-  Verified
+  Verified,
+  X,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { supabase } from './lib/supabase';
+import { Ad, MarketPrice } from './types';
 
 const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
 const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
@@ -28,14 +32,86 @@ const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e0
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [ads, setAds] = useState<Ad[]>([]);
+  const [prices, setPrices] = useState<MarketPrice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showPostForm, setShowPostForm] = useState(false);
+  const [posting, setPosting] = useState(false);
 
-  const marketPrices = [
-    { date: '24/10/23', market: 'KAMPALA (OWINO)', variety: 'Maize Grain (White)', grade: 'G1', price: '1,250', change: '+4.2%', trend: 'up' },
-    { date: '24/10/23', market: 'MBALE', variety: 'Supa Rice', grade: 'G1', price: '3,800', change: '-1.5%', trend: 'down' },
-    { date: '24/10/23', market: 'MASAKA', variety: 'Beans (Nambale)', grade: 'G2', price: '2,400', change: '0.0%', trend: 'stable' },
-    { date: '23/10/23', market: 'GULU', variety: 'Cassava Chips', grade: 'G1', price: '850', change: '+12.0%', trend: 'up' },
-    { date: '23/10/23', market: 'KAMPALA (KASE)', variety: 'Soy Beans', grade: 'G1', price: '2,100', change: '-3.2%', trend: 'down' },
-  ];
+  // Form State
+  const [newAd, setNewAd] = useState({
+    title: '',
+    description: '',
+    contact: '',
+    category: 'Maize',
+    price: '',
+    type: 'selling' as 'selling' | 'buying' | 'service'
+  });
+
+  useEffect(() => {
+    fetchInitialData();
+    
+    // Subscribe to ads
+    const adsSubscription = supabase
+      .channel('public:ads')
+      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+        if (payload.eventType === 'INSERT') {
+          setAds(prev => [payload.new as Ad, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          setAds(prev => prev.map(ad => ad.id === payload.new.id ? payload.new as Ad : ad));
+        } else if (payload.eventType === 'DELETE') {
+          setAds(prev => prev.filter(ad => ad.id === payload.old.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(adsSubscription);
+    };
+  }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      setLoading(true);
+      const [adsRes, pricesRes] = await Promise.all([
+        supabase.from('ads').select('*').order('created_at', { ascending: false }),
+        supabase.from('market_prices').select('*').order('date', { ascending: false })
+      ]);
+
+      if (adsRes.data) setAds(adsRes.data);
+      if (pricesRes.data) setPrices(pricesRes.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePostAd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAd.title || !newAd.description || !newAd.contact) return;
+
+    try {
+      setPosting(true);
+      const { error } = await supabase.from('ads').insert([newAd]);
+      if (error) throw error;
+      
+      setShowPostForm(false);
+      setNewAd({
+        title: '',
+        description: '',
+        contact: '',
+        category: 'Maize',
+        price: '',
+        type: 'selling'
+      });
+    } catch (error) {
+      console.error('Error posting ad:', error);
+      alert('Failed to post ad. Please check your Supabase connection.');
+    } finally {
+      setPosting(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -204,11 +280,107 @@ export default function App() {
                     High-precision trade portal for Ugandan agribusiness. Direct equipment sales, seed distribution, and expert livestock listings.
                   </p>
                 </div>
-                <button className="neo-button flex items-center gap-2 h-14">
+                <button 
+                  onClick={() => setShowPostForm(true)}
+                  className="neo-button flex items-center gap-2 h-14"
+                >
                   <PlusSquare size={20} />
                   <span>Post an Ad</span>
                 </button>
               </section>
+
+              <AnimatePresence>
+                {showPostForm && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                  >
+                    <div className="bg-white border-4 border-black p-8 w-full max-w-lg neo-shadow relative">
+                      <button 
+                        onClick={() => setShowPostForm(false)}
+                        className="absolute top-4 right-4 p-2 hover:bg-gray-100 border-2 border-transparent hover:border-black transition-all"
+                      >
+                        <X size={24} />
+                      </button>
+                      
+                      <h2 className="font-display text-3xl font-black uppercase mb-8 tracking-tighter italic">Post New Advertisement</h2>
+                      
+                      <form onSubmit={handlePostAd} className="space-y-6">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="col-span-2">
+                            <label className="block text-xs font-black uppercase mb-2">Ad Title</label>
+                            <input 
+                              required
+                              className="w-full border-2 border-black p-3 font-medium outline-none focus:bg-accent/10"
+                              placeholder="e.g. Selling 50 Bags of Maize"
+                              value={newAd.title}
+                              onChange={e => setNewAd({...newAd, title: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black uppercase mb-2">Category</label>
+                            <select 
+                              className="w-full border-2 border-black p-3 font-medium outline-none"
+                              value={newAd.category}
+                              onChange={e => setNewAd({...newAd, category: e.target.value})}
+                            >
+                              <option>Maize</option>
+                              <option>Rice</option>
+                              <option>Beans</option>
+                              <option>Tobacco</option>
+                              <option>Coffee</option>
+                              <option>Cattle</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black uppercase mb-2">Price (UGX)</label>
+                            <input 
+                              className="w-full border-2 border-black p-3 font-medium outline-none"
+                              placeholder="e.g. 120,000"
+                              value={newAd.price}
+                              onChange={e => setNewAd({...newAd, price: e.target.value})}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-xs font-black uppercase mb-2">Description</label>
+                          <textarea 
+                            required
+                            rows={3}
+                            className="w-full border-2 border-black p-3 font-medium outline-none"
+                            placeholder="Describe your product, variety, and state..."
+                            value={newAd.description}
+                            onChange={e => setNewAd({...newAd, description: e.target.value})}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-black uppercase mb-2">Contact Info</label>
+                          <input 
+                            required
+                            className="w-full border-2 border-black p-3 font-medium outline-none"
+                            placeholder="Phone number or Location"
+                            value={newAd.contact}
+                            onChange={e => setNewAd({...newAd, contact: e.target.value})}
+                          />
+                        </div>
+
+                        <button 
+                          disabled={posting}
+                          type="submit"
+                          className="w-full neo-button flex items-center justify-center gap-2 h-16 disabled:opacity-50"
+                        >
+                          {posting ? <Loader2 className="animate-spin" /> : <PlusSquare size={20} />}
+                          <span>{posting ? 'PUBLISHING...' : 'SUBMIT ADVERTISEMENT'}</span>
+                        </button>
+                      </form>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <section className="flex flex-wrap gap-4 mb-12">
                 <button className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest">All Listings</button>
@@ -219,84 +391,64 @@ export default function App() {
               </section>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                <div className="md:col-span-8 border-2 border-black bg-white group overflow-hidden neo-shadow">
-                  <div className="relative h-64 md:h-96 border-b-2 border-black overflow-hidden">
-                    <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src={tractorImage} alt="Large tractor" />
-                    <div className="absolute top-4 left-4 bg-accent border-2 border-black px-4 py-2 font-black uppercase text-xs">Featured</div>
+                {loading ? (
+                  <div className="md:col-span-12 flex flex-col items-center justify-center py-20 opacity-20">
+                    <Loader2 size={48} className="animate-spin mb-4" />
+                    <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
-                  <div className="p-8 grid md:grid-cols-2 gap-8">
-                    <div>
-                      <h3 className="font-display text-3xl font-black uppercase mb-4 tracking-tighter">John Deere 5075E 4WD</h3>
-                      <p className="text-gray-600 font-medium">2023 Model, only 120 hours. Specialized for large-scale maize production. Full service history included.</p>
-                    </div>
-                    <div className="flex flex-col justify-between items-end">
-                      <span className="font-display text-3xl font-black text-black">UGX 145,000,000</span>
-                      <div className="flex gap-2 w-full mt-6">
-                        <button className="flex-1 border-2 border-black h-12 font-black uppercase hover:bg-black hover:text-white transition-colors">Details</button>
-                        <button className="flex-1 bg-black text-white border-2 border-black h-12 font-black uppercase hover:bg-accent hover:text-black transition-colors">Contact</button>
+                ) : ads.length === 0 ? (
+                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
+                    <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                  </div>
+                ) : (
+                  ads.map((ad, index) => (
+                    <motion.div 
+                      key={ad.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className={`${index === 0 ? 'md:col-span-8' : 'md:col-span-4'} border-2 border-black bg-white group overflow-hidden neo-shadow flex flex-col`}
+                    >
+                      <div className={`relative ${index === 0 ? 'h-64 md:h-96' : 'h-48'} border-b-2 border-black overflow-hidden bg-gray-100 flex items-center justify-center`}>
+                        {ad.image_url ? (
+                          <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src={ad.image_url} alt={ad.title} />
+                        ) : (
+                          <div className="flex flex-col items-center opacity-10">
+                            <Ads size={index === 0 ? 80 : 40} />
+                            <span className="text-[10px] font-black uppercase mt-2">{ad.category}</span>
+                          </div>
+                        )}
+                        <div className="absolute top-4 left-4 bg-accent border-2 border-black px-4 py-2 font-black uppercase text-xs">
+                          {ad.type} {index === 0 && '• Featured'}
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow">
-                  <div className="h-64 border-b-2 border-black overflow-hidden">
-                    <img className="w-full h-full object-cover" src={pumpImage} alt="Solar pump" />
-                  </div>
-                  <div className="p-6 flex-grow flex flex-col justify-between">
-                    <div>
-                      <span className="text-xs uppercase font-black text-gray-500 tracking-[0.2em]">Irrigation</span>
-                      <h3 className="font-display text-2xl font-black uppercase mt-2 tracking-tighter leading-none">Solar Water Pump 5HP</h3>
-                      <p className="text-sm text-gray-600 mt-4 font-medium">Complete kit with panels and 200m hose. High efficiency for dry season.</p>
-                    </div>
-                    <div className="mt-8 pt-6 border-t-2 border-black flex justify-between items-center">
-                      <span className="font-black text-xl">UGX 4,200,000</span>
-                      <button className="h-12 w-12 border-2 border-black flex items-center justify-center hover:bg-accent transition-colors"><ChevronRight size={24} /></button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow">
-                  <div className="p-4 border-b-2 border-black bg-gray-50 flex justify-between items-center">
-                    <span className="text-xs uppercase font-black tracking-widest">Seed Supplies</span>
-                    <Verified size={20} className="text-sky-blue" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-display text-2xl font-black uppercase mb-2 tracking-tighter">Hybrid Maize Longe 10H</h3>
-                    <p className="text-sm text-gray-600 mb-6 font-medium">Certified seeds, 50kg bags. High yield resistance to local pests. In stock in Kampala.</p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-black text-xl">UGX 350,000 <span className="text-xs font-normal text-gray-500">/ bag</span></span>
-                      <button className="border-2 border-black px-6 py-2 font-black uppercase text-xs hover:bg-black hover:text-white transition-colors">Order</button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow">
-                  <div className="h-48 border-b-2 border-black overflow-hidden bg-black flex items-center justify-center">
-                    <Ads size={64} className="text-accent" />
-                  </div>
-                  <div className="p-6 flex-grow">
-                    <h3 className="font-display text-2xl font-black uppercase mb-2 tracking-tighter">Wanted: Grain Dryer</h3>
-                    <p className="text-sm text-gray-600 mb-6 font-medium">Looking for a used industrial grain dryer for cocoa processing. Must be 5-ton capacity.</p>
-                    <div className="bg-accent border-2 border-black p-4 flex items-center gap-4">
-                      <Phone size={20} />
-                      <span className="font-black uppercase text-xs tracking-wider">Call Buyer: +256 702...</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="md:col-span-4 border-2 border-black bg-white flex flex-col neo-shadow grayscale opacity-70">
-                  <div className="h-48 border-b-2 border-black overflow-hidden relative">
-                    <img className="w-full h-full object-cover" src={fertilizerImage} alt="Fertilizer" />
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="text-white font-black uppercase text-xl border-2 border-white p-4 tracking-tighter">Sold Out</span>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-display text-2xl font-black uppercase mb-2 tracking-tighter">NPK 17-17-17 Bulk</h3>
-                    <p className="text-sm text-gray-500 font-medium">Last batch was cleared on Nov 12. Check back for next delivery.</p>
-                  </div>
-                </div>
+                      <div className="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                          <div className="flex justify-between items-start mb-2">
+                             <span className="text-[10px] uppercase font-black text-gray-500 tracking-[0.2em]">{ad.category}</span>
+                             <span className="text-[10px] font-mono text-gray-400">{new Date(ad.created_at).toLocaleDateString()}</span>
+                          </div>
+                          <h3 className={`font-display ${index === 0 ? 'text-3xl' : 'text-xl'} font-black uppercase mb-4 tracking-tighter leading-tight`}>{ad.title}</h3>
+                          <p className={`text-gray-600 font-medium line-clamp-3 mb-6 ${index === 0 ? 'text-base' : 'text-sm'}`}>{ad.description}</p>
+                        </div>
+                        <div className="mt-auto">
+                          <div className="flex flex-col gap-4">
+                            <div className="flex justify-between items-end">
+                              <span className="font-display font-black text-2xl">UGX {ad.price || 'Negotiable'}</span>
+                              <div className="flex gap-2">
+                                <button className="h-10 px-4 border-2 border-black font-black uppercase text-[10px] hover:bg-black hover:text-white transition-colors">Details</button>
+                              </div>
+                            </div>
+                            <div className="bg-accent/20 border-2 border-black p-3 flex items-center gap-3">
+                              <Phone size={14} />
+                              <span className="font-black uppercase text-[10px] truncate">{ad.contact}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
               </div>
             </motion.div>
           ) : activeTab === 'prices' ? (
@@ -343,23 +495,33 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="text-sm font-medium">
-                      {marketPrices.map((row, i) => (
-                        <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-accent/10 transition-colors`}>
-                          <td className="p-4 border border-black/10 font-mono text-xs">{row.date}</td>
-                          <td className="p-4 border border-black/10 font-black uppercase italic">{row.market}</td>
-                          <td className="p-4 border border-black/10">{row.variety}</td>
-                          <td className="p-4 border border-black/10 text-center">
-                            <span className="bg-secondary-container px-2 py-0.5 border border-black font-black text-[10px]">{row.grade}</span>
-                          </td>
-                          <td className="p-4 border border-black/10 text-right font-black font-mono text-lg">{row.price}</td>
-                          <td className="p-4 border border-black/10">
-                            <div className={`flex items-center justify-center gap-1 font-black italic ${row.trend === 'up' ? 'text-red-600' : row.trend === 'down' ? 'text-green-600' : 'text-gray-400'}`}>
-                              {row.trend === 'up' ? <TrendingUp size={14} /> : row.trend === 'down' ? <TrendingDown size={14} /> : <Minus size={14} />}
-                              <span>{row.change}</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {loading ? (
+                         <tr>
+                           <td colSpan={6} className="p-10 text-center opacity-20 font-black uppercase italic">Syncing with national markets...</td>
+                         </tr>
+                      ) : prices.length === 0 ? (
+                        <tr>
+                           <td colSpan={6} className="p-10 text-center opacity-20 font-black uppercase italic">Market price data currently unavailable</td>
+                         </tr>
+                      ) : (
+                        prices.map((row, i) => (
+                          <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-accent/10 transition-colors`}>
+                            <td className="p-4 border border-black/10 font-mono text-xs">{new Date(row.date).toLocaleDateString()}</td>
+                            <td className="p-4 border border-black/10 font-black uppercase italic">{row.market}</td>
+                            <td className="p-4 border border-black/10">{row.variety}</td>
+                            <td className="p-4 border border-black/10 text-center">
+                              <span className="bg-secondary-container px-2 py-0.5 border border-black font-black text-[10px]">{row.grade}</span>
+                            </td>
+                            <td className="p-4 border border-black/10 text-right font-black font-mono text-lg">{row.price}</td>
+                            <td className="p-4 border border-black/10">
+                              <div className={`flex items-center justify-center gap-1 font-black italic ${row.trend === 'up' ? 'text-red-600' : row.trend === 'down' ? 'text-green-600' : 'text-gray-400'}`}>
+                                {row.trend === 'up' ? <TrendingUp size={14} /> : row.trend === 'down' ? <TrendingDown size={14} /> : <Minus size={14} />}
+                                <span>{row.change}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
