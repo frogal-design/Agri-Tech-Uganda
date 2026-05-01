@@ -1,0 +1,6 @@
+{
+  "name": "Agri-Tech Uganda USSD Simulator",
+  "description": "A high-contrast, offline-first USSD simulation tool for rural farmers in Uganda, providing market prices and diagnostics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

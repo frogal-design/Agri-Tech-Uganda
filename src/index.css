@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Lexend:wght@300..700&family=JetBrains+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Lexend", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-primary: #00668a;
+  --color-primary-container: #00bfff;
+  --color-secondary: #4b6700;
+  --color-secondary-container: #b6f300;
+  --color-tertiary-container: #fb9c24;
+  --color-surface: #f5faff;
+  --color-on-background: #161c20;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-background font-sans min-h-screen;
+  }
+}
+
+@layer components {
+  .ussd-border {
+    @apply border-2 border-black;
+  }
+  
+  .ussd-shadow {
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+
+  /* Define complex components directly without nested custom @apply */
+  .ussd-terminal-header {
+    @apply bg-black text-white p-2 font-mono text-xs flex justify-between uppercase border-2 border-black;
+  }
+
+  .ussd-card {
+    @apply bg-white border-2 border-black p-4;
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+}
+
