@@ -18,11 +18,13 @@ import {
   Menu,
   Verified,
   X,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from './lib/supabase';
 import { Ad, MarketPrice } from './types';
+import { refreshMarketPrices } from './services/marketService';
 
 const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
 const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
@@ -37,6 +39,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -84,6 +87,19 @@ export default function App() {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRefreshPrices = async () => {
+    try {
+      setRefreshing(true);
+      const updatedPrices = await refreshMarketPrices();
+      setPrices(updatedPrices);
+    } catch (error) {
+      console.error('Error refreshing prices:', error);
+      alert('Failed to refresh market prices. Please check your Gemini API key.');
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -476,9 +492,19 @@ export default function App() {
               <section className="border-2 border-black bg-white overflow-hidden neo-shadow">
                 <div className="p-6 border-b-2 border-black bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                   <h1 className="font-display text-3xl font-black uppercase tracking-tighter italic">Wholesale Market Prices</h1>
-                  <div className="w-full md:w-auto flex items-center border-2 border-black bg-white px-4 h-12">
-                    <Search size={20} className="text-gray-400 mr-3" />
-                    <input className="border-none focus:ring-0 w-full md:w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                  <div className="w-full md:w-auto flex items-center gap-4">
+                    <button 
+                      onClick={handleRefreshPrices}
+                      disabled={refreshing}
+                      className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-xs tracking-widest hover:bg-accent transition-colors flex items-center gap-2 h-12"
+                    >
+                      <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+                      <span>{refreshing ? 'Searching...' : 'Refresh Live Prices'}</span>
+                    </button>
+                    <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
+                      <Search size={20} className="text-gray-400 mr-3" />
+                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                    </div>
                   </div>
                 </div>
 
