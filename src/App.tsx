@@ -154,12 +154,12 @@ export default function App() {
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center border-2 border-black bg-white px-3 h-10">
             <Search size={18} className="text-black" />
-            <input className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
+            <input aria-label="Search marketplace" className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
           </div>
-          <button className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+          <button aria-label="Change language" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <Languages size={20} className="text-black" />
           </button>
-          <button className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+          <button aria-label="User profile" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <User size={20} className="text-black" />
           </button>
         </div>
@@ -328,21 +328,28 @@ export default function App() {
                     exit={{ opacity: 0, scale: 0.9 }}
                     className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
                   >
-                    <div className="bg-white border-4 border-black p-8 w-full max-w-lg neo-shadow relative">
+                    <div
+                      role="dialog"
+                      aria-modal="true"
+                      aria-labelledby="modal-title"
+                      className="bg-white border-4 border-black p-8 w-full max-w-lg neo-shadow relative"
+                    >
                       <button 
                         onClick={() => setShowPostForm(false)}
+                        aria-label="Close modal"
                         className="absolute top-4 right-4 p-2 hover:bg-gray-100 border-2 border-transparent hover:border-black transition-all"
                       >
                         <X size={24} />
                       </button>
                       
-                      <h2 className="font-display text-3xl font-black uppercase mb-8 tracking-tighter italic">Post New Advertisement</h2>
+                      <h2 id="modal-title" className="font-display text-3xl font-black uppercase mb-8 tracking-tighter italic">Post New Advertisement</h2>
                       
                       <form onSubmit={handlePostAd} className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                           <div className="col-span-2">
-                            <label className="block text-xs font-black uppercase mb-2">Ad Title</label>
+                            <label htmlFor="ad-title" className="block text-xs font-black uppercase mb-2">Ad Title</label>
                             <input 
+                              id="ad-title"
                               required
                               className="w-full border-2 border-black p-3 font-medium outline-none focus:bg-accent/10"
                               placeholder="e.g. Selling 50 Bags of Maize"
@@ -351,8 +358,9 @@ export default function App() {
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-black uppercase mb-2">Category</label>
+                            <label htmlFor="ad-category" className="block text-xs font-black uppercase mb-2">Category</label>
                             <select 
+                              id="ad-category"
                               className="w-full border-2 border-black p-3 font-medium outline-none"
                               value={newAd.category}
                               onChange={e => setNewAd({...newAd, category: e.target.value})}
@@ -366,8 +374,9 @@ export default function App() {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-black uppercase mb-2">Price (UGX)</label>
+                            <label htmlFor="ad-price" className="block text-xs font-black uppercase mb-2">Price (UGX)</label>
                             <input 
+                              id="ad-price"
                               className="w-full border-2 border-black p-3 font-medium outline-none"
                               placeholder="e.g. 120,000"
                               value={newAd.price}
@@ -377,8 +386,9 @@ export default function App() {
                         </div>
                         
                         <div>
-                          <label className="block text-xs font-black uppercase mb-2">Description</label>
+                          <label htmlFor="ad-description" className="block text-xs font-black uppercase mb-2">Description</label>
                           <textarea 
+                            id="ad-description"
                             required
                             rows={3}
                             className="w-full border-2 border-black p-3 font-medium outline-none"
@@ -389,8 +399,9 @@ export default function App() {
                         </div>
 
                         <div>
-                          <label className="block text-xs font-black uppercase mb-2">Contact Info</label>
+                          <label htmlFor="ad-contact" className="block text-xs font-black uppercase mb-2">Contact Info</label>
                           <input 
+                            id="ad-contact"
                             required
                             className="w-full border-2 border-black p-3 font-medium outline-none"
                             placeholder="Phone number or Location"
