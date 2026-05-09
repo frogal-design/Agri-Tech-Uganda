@@ -154,7 +154,7 @@ export default function App() {
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center border-2 border-black bg-white px-3 h-10">
             <Search size={18} className="text-black" />
-            <input aria-label="Search marketplace" className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
+            <input aria-label="Search marketplace" className="border-none text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
           </div>
           <button aria-label="Change language" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <Languages size={20} className="text-black" />
@@ -220,11 +220,15 @@ export default function App() {
                       </div>
                     </div>
                     <div className="h-16 border-t-2 border-black flex items-center justify-around bg-white">
-                      <ArrowLeft size={20} className="text-black" />
-                      <div className="w-10 h-10 border-2 border-black rounded-full flex items-center justify-center">
+                      <button aria-label="Back" className="p-2 hover:bg-accent transition-colors active:translate-y-0.5">
+                        <ArrowLeft size={20} className="text-black" />
+                      </button>
+                      <button aria-label="Home" className="w-10 h-10 border-2 border-black rounded-full flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5">
                         <div className="w-6 h-6 bg-black rounded-sm"></div>
-                      </div>
-                      <Menu size={20} className="text-black" />
+                      </button>
+                      <button aria-label="Menu" className="p-2 hover:bg-accent transition-colors active:translate-y-0.5">
+                        <Menu size={20} className="text-black" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -529,7 +533,12 @@ export default function App() {
                     </button>
                     <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
                       <Search size={20} className="text-gray-400 mr-3" />
-                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                      <input
+                        aria-label="Search markets or crops"
+                        className="border-none w-64 font-bold text-sm"
+                        placeholder="Search markets or crops..."
+                        type="text"
+                      />
                     </div>
                   </div>
                 </div>
