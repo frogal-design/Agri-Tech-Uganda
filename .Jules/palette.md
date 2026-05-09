@@ -1,0 +1,3 @@
+## 2025-05-15 - Neo-brutalist Accessibility & Focus States
+**Learning:** In Neo-brutalist design systems, accessibility markers like focus states can often be overlooked because the bold aesthetic (thick borders, high contrast) might seem to compete with them. However, leveraging the same design tokens (thick black outlines with offsets) makes focus states feel like a first-class citizen of the design rather than an afterthought.
+**Action:** Always define a global `focus-visible` style that matches the Neo-brutalist aesthetic (e.g., `outline: 3px solid #000; outline-offset: 2px;`) and remove anti-patterns like `focus:ring-0` which are often carried over from more "minimalist" UI kits.

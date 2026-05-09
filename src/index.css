@@ -22,6 +22,11 @@
     background-image: linear-gradient(#e2e2e2 1px, transparent 1px), linear-gradient(90deg, #e2e2e2 1px, transparent 1px);
     background-size: 32px 32px;
   }
+
+  *:focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
