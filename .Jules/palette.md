@@ -1,0 +1,3 @@
+## 2025-05-15 - Global Focus-Visible Styles & Semantic Buttons
+**Learning:** In a "Neo-brutalist" design system that often uses `focus:ring-0` to remove default browser styling, it is critical to provide a high-contrast global `focus-visible` outline (e.g., 3px black with 2px offset) to maintain keyboard accessibility. Additionally, interactive cards and icons must be semantic `<button>` tags rather than `<div>` to be natively focusable and accessible to screen readers.
+**Action:** Always check for `focus:ring-0` in Tailwind-based apps and ensure a robust `focus-visible` replacement exists in the global CSS. Convert any clickable `div` or `span` to `<button>` with appropriate `aria-label`.
