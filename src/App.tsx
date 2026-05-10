@@ -19,7 +19,9 @@ import {
   Verified,
   X,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Copy,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from './lib/supabase';
@@ -50,6 +52,7 @@ export default function App() {
     price: '',
     type: 'selling' as 'selling' | 'buying' | 'service'
   });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchInitialData();
@@ -107,6 +110,12 @@ export default function App() {
     } finally {
       setRefreshing(false);
     }
+  };
+
+  const handleCopyUSSD = () => {
+    navigator.clipboard.writeText('*135#');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handlePostAd = async (e: React.FormEvent) => {
@@ -195,8 +204,17 @@ export default function App() {
                       </div>
                     </div>
                     <div className="flex-grow p-6 flex flex-col">
-                      <div className="mb-4 bg-black text-accent p-2 inline-block self-start font-mono text-[10px] font-bold uppercase">
-                        DIALING *135#...
+                      <div className="mb-4 flex items-center gap-2">
+                        <div className="bg-black text-accent p-2 font-mono text-[10px] font-bold uppercase">
+                          DIALING *135#...
+                        </div>
+                        <button
+                          onClick={handleCopyUSSD}
+                          aria-label="Copy USSD code"
+                          className="p-2 border-2 border-black bg-white hover:bg-accent transition-colors active:translate-y-0.5"
+                        >
+                          {copied ? <Check size={12} /> : <Copy size={12} />}
+                        </button>
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
                         <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
@@ -220,11 +238,15 @@ export default function App() {
                       </div>
                     </div>
                     <div className="h-16 border-t-2 border-black flex items-center justify-around bg-white">
-                      <ArrowLeft size={20} className="text-black" />
-                      <div className="w-10 h-10 border-2 border-black rounded-full flex items-center justify-center">
+                      <button aria-label="Back" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <ArrowLeft size={20} className="text-black" />
+                      </button>
+                      <button aria-label="Home" className="w-10 h-10 border-2 border-black rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
                         <div className="w-6 h-6 bg-black rounded-sm"></div>
-                      </div>
-                      <Menu size={20} className="text-black" />
+                      </button>
+                      <button aria-label="Menu" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <Menu size={20} className="text-black" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -235,25 +257,25 @@ export default function App() {
                 <div className="bg-white border-2 border-black p-6 neo-shadow">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="bg-black text-white w-12 h-12 flex items-center justify-center font-display text-2xl font-black">01</div>
-                    <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
+                    <h2 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h2>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button className="text-left p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
                       <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button className="text-left p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
                       <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button className="text-left p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
                       <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button className="text-left p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
                       <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    </button>
                   </div>
                 </div>
 
