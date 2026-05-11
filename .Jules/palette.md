@@ -1,0 +1,3 @@
+## 2025-05-23 - Custom Focus States for Neo-brutalist Design
+**Learning:** In high-contrast "Neo-brutalist" design systems, default browser or framework focus rings (like `focus:ring-0`) are often intentionally disabled or visually lost against bold borders. Accessibility requires a custom, high-visibility `:focus-visible` style that complements the aesthetic while ensuring keyboard navigation is unmistakable.
+**Action:** Always implement a global high-contrast `:focus-visible` outline (e.g., 3px solid black with an offset) to override utility-class resets and maintain accessibility without compromising the design language.
