@@ -48,3 +48,9 @@
   }
 }
 
+@layer base {
+  :focus-visible {
+    outline: 3px solid black !important;
+    outline-offset: 2px !important;
+  }
+}

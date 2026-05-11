@@ -238,22 +238,22 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button type="button" aria-label="Select English language" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
                       <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" aria-label="Select Swahili language" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
                       <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" aria-label="Select Luganda language" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
                       <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" aria-label="Select Luo language" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
                       <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    </button>
                   </div>
                 </div>
 
@@ -439,8 +439,16 @@ export default function App() {
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
                 ) : ads.length === 0 ? (
-                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
-                    <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10 flex flex-col items-center gap-6">
+                    <p className="font-display text-2xl font-black uppercase text-black/40">No active advertisements found</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowPostForm(true)}
+                      className="neo-button flex items-center gap-2"
+                    >
+                      <PlusSquare size={20} />
+                      <span>Post first advertisement</span>
+                    </button>
                   </div>
                 ) : (
                   ads.map((ad, index) => (
@@ -529,7 +537,7 @@ export default function App() {
                     </button>
                     <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
                       <Search size={20} className="text-gray-400 mr-3" />
-                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                      <input aria-label="Search markets or crops" className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
                     </div>
                   </div>
                 </div>
