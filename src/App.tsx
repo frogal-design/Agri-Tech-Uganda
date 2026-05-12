@@ -619,6 +619,8 @@ export default function App() {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
+          type="button"
+          aria-current={activeTab === 'prices' ? 'page' : undefined}
           onClick={() => setActiveTab('prices')}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
@@ -626,6 +628,8 @@ export default function App() {
           <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
+          type="button"
+          aria-current={activeTab === 'ads' ? 'page' : undefined}
           onClick={() => setActiveTab('ads')}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
@@ -633,6 +637,8 @@ export default function App() {
           <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
+          type="button"
+          aria-current={activeTab === 'ussd' ? 'page' : undefined}
           onClick={() => setActiveTab('ussd')}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
@@ -640,6 +646,8 @@ export default function App() {
           <span className="font-display text-[10px] font-black uppercase mt-1">USSD</span>
         </button>
         <button 
+          type="button"
+          aria-current={activeTab === 'profile' ? 'page' : undefined}
           onClick={() => setActiveTab('profile')}
           className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
