@@ -238,22 +238,22 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
                       <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
                       <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
                       <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
                       <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    </button>
                   </div>
                 </div>
 
