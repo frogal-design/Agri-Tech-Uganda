@@ -32,8 +32,56 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+const ussdMenus = {
+  ENGLISH: {
+    title: 'AGRI-PULSE MAIN MENU',
+    options: [
+      '1. Market Prices',
+      '2. Post Advertisement',
+      '3. Crop Diseases',
+      '4. Weather Forecast',
+      '5. Account Settings',
+      '6. Help / Feedback'
+    ]
+  },
+  SWAHILI: {
+    title: 'MENU KUU YA AGRI-PULSE',
+    options: [
+      '1. Bei za Soko',
+      '2. Chapisha Tangazo',
+      '3. Magonjwa ya Mazao',
+      '4. Utabiri wa Hali ya Hewa',
+      '5. Mipangilio ya Akaunti',
+      '6. Msaada / Maoni'
+    ]
+  },
+  LUGANDA: {
+    title: 'AGRI-PULSE EBYOKULYA',
+    options: [
+      '1. Emiwendo gy\'Obutale',
+      '2. Langira ebirime',
+      '3. Endwadde z\'ebirime',
+      '4. Obudde',
+      '5. Enteekateeka ya akawunti',
+      '6. Obuyambi / Okuddamu'
+    ]
+  },
+  LUO: {
+    title: 'AGRI-PULSE MAIN MENU',
+    options: [
+      '1. Wel Mar Chiro',
+      '2. Keto Lango',
+      '3. Tuo Mar Pur',
+      '4. Ng\'eyo Koth',
+      '5. Ndiko Mar Akaunt',
+      '6. Kony / Duoko'
+    ]
+  }
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [ussdLanguage, setUssdLanguage] = useState<'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO'>('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -154,12 +202,12 @@ export default function App() {
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center border-2 border-black bg-white px-3 h-10">
             <Search size={18} className="text-black" />
-            <input aria-label="Search marketplace" className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
+            <input type="search" aria-label="Search marketplace" className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." />
           </div>
-          <button aria-label="Change language" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+          <button type="button" aria-label="Change language" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <Languages size={20} className="text-black" />
           </button>
-          <button aria-label="User profile" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+          <button type="button" aria-label="User profile" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <User size={20} className="text-black" />
           </button>
         </div>
@@ -199,22 +247,19 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">{ussdMenus[ussdLanguage].title}</p>
                         <ul className="text-xs space-y-2 uppercase">
-                          <li>1. Market Prices</li>
-                          <li>2. Post Advertisement</li>
-                          <li>3. Crop Diseases</li>
-                          <li>4. Weather Forecast</li>
-                          <li>5. Account Settings</li>
-                          <li>6. Help / Feedback</li>
+                          {ussdMenus[ussdLanguage].options.map((option, idx) => (
+                            <li key={idx}>{option}</li>
+                          ))}
                         </ul>
                         <div className="mt-8">
                           <div className="border-b-2 border-black w-full h-8 flex items-center">
                             <span className="animate-pulse">|</span>
                           </div>
                           <div className="flex justify-between mt-2">
-                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
-                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                            <button type="button" className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
+                            <button type="button" className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
                           </div>
                         </div>
                       </div>
@@ -238,22 +283,42 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button
+                      type="button"
+                      onClick={() => setUssdLanguage('ENGLISH')}
+                      aria-label="Select English"
+                      className={`p-4 border-2 border-black transition-colors cursor-pointer text-left hover:bg-accent/50 ${ussdLanguage === 'ENGLISH' ? 'bg-accent shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <p className="text-[10px] text-gray-500 uppercase">Default System Language</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUssdLanguage('SWAHILI')}
+                      aria-label="Select Swahili"
+                      className={`p-4 border-2 border-black transition-colors cursor-pointer text-left hover:bg-accent/50 ${ussdLanguage === 'SWAHILI' ? 'bg-accent shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <p className="text-[10px] text-gray-500 uppercase">Regional Standard</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUssdLanguage('LUGANDA')}
+                      aria-label="Select Luganda"
+                      className={`p-4 border-2 border-black transition-colors cursor-pointer text-left hover:bg-accent/50 ${ussdLanguage === 'LUGANDA' ? 'bg-accent shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <p className="text-[10px] text-gray-500 uppercase">Central Region Dialect</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUssdLanguage('LUO')}
+                      aria-label="Select Luo"
+                      className={`p-4 border-2 border-black transition-colors cursor-pointer text-left hover:bg-accent/50 ${ussdLanguage === 'LUO' ? 'bg-accent shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                      <p className="text-[10px] text-gray-500 uppercase">Northern Region Dialect</p>
+                    </button>
                   </div>
                 </div>
 
@@ -279,8 +344,8 @@ export default function App() {
                     <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
                   </div>
                   <div className="mt-6 flex gap-4">
-                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
-                    <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
+                    <button type="button" className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
+                    <button type="button" className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
                   </div>
                 </div>
               </div>
@@ -312,6 +377,7 @@ export default function App() {
                   </p>
                 </div>
                 <button 
+                  type="button"
                   onClick={() => setShowPostForm(true)}
                   className="neo-button flex items-center gap-2 h-14"
                 >
@@ -335,6 +401,7 @@ export default function App() {
                       className="bg-white border-4 border-black p-8 w-full max-w-lg neo-shadow relative"
                     >
                       <button 
+                        type="button"
                         onClick={() => setShowPostForm(false)}
                         aria-label="Close modal"
                         className="absolute top-4 right-4 p-2 hover:bg-gray-100 border-2 border-transparent hover:border-black transition-all"
@@ -425,11 +492,11 @@ export default function App() {
               </AnimatePresence>
 
               <section className="flex flex-wrap gap-4 mb-12">
-                <button className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest">All Listings</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Tractors</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Irrigation</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Fertilizer</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Livestock</button>
+                <button type="button" className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest">All Listings</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Tractors</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Irrigation</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Fertilizer</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Livestock</button>
               </section>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -478,7 +545,7 @@ export default function App() {
                             <div className="flex justify-between items-end">
                               <span className="font-display font-black text-2xl">UGX {ad.price || 'Negotiable'}</span>
                               <div className="flex gap-2">
-                                <button className="h-10 px-4 border-2 border-black font-black uppercase text-[10px] hover:bg-black hover:text-white transition-colors">Details</button>
+                                <button type="button" className="h-10 px-4 border-2 border-black font-black uppercase text-[10px] hover:bg-black hover:text-white transition-colors">Details</button>
                               </div>
                             </div>
                             <div className="bg-accent/20 border-2 border-black p-3 flex items-center gap-3">
@@ -520,6 +587,7 @@ export default function App() {
                   <h1 className="font-display text-3xl font-black uppercase tracking-tighter italic">Wholesale Market Prices</h1>
                   <div className="w-full md:w-auto flex items-center gap-4">
                     <button 
+                      type="button"
                       onClick={handleRefreshPrices}
                       disabled={refreshing}
                       className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-xs tracking-widest hover:bg-accent transition-colors flex items-center gap-2 h-12"
@@ -529,7 +597,7 @@ export default function App() {
                     </button>
                     <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
                       <Search size={20} className="text-gray-400 mr-3" />
-                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                      <input type="search" aria-label="Search markets or crops" className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." />
                     </div>
                   </div>
                 </div>
@@ -579,9 +647,9 @@ export default function App() {
                 </div>
 
                 <div className="p-6 bg-gray-50 flex justify-center items-center gap-8 border-t-2 border-black">
-                  <button className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">PREVIOUS</button>
+                  <button type="button" className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">PREVIOUS</button>
                   <span className="font-black italic tracking-widest text-sm">PAGE 1 OF 12</span>
-                  <button className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">NEXT</button>
+                  <button type="button" className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">NEXT</button>
                 </div>
               </section>
 
@@ -591,7 +659,7 @@ export default function App() {
                   <p className="text-lg font-medium text-gray-600 mb-8 leading-relaxed">
                     Accurate market information helps you negotiate better prices at the farm gate. Our data is updated daily from major hubs across Uganda.
                   </p>
-                  <button className="bg-sky-blue text-white border-2 border-black py-4 font-display font-black uppercase tracking-[0.2em] hover:bg-black transition-all active:translate-y-1">
+                  <button type="button" className="bg-sky-blue text-white border-2 border-black py-4 font-display font-black uppercase tracking-[0.2em] hover:bg-black transition-all active:translate-y-1">
                     GET SMS ALERTS
                   </button>
                 </div>
@@ -619,6 +687,7 @@ export default function App() {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
+          type="button"
           onClick={() => setActiveTab('prices')}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
@@ -626,6 +695,7 @@ export default function App() {
           <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
+          type="button"
           onClick={() => setActiveTab('ads')}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
@@ -633,6 +703,7 @@ export default function App() {
           <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
+          type="button"
           onClick={() => setActiveTab('ussd')}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
@@ -640,6 +711,7 @@ export default function App() {
           <span className="font-display text-[10px] font-black uppercase mt-1">USSD</span>
         </button>
         <button 
+          type="button"
           onClick={() => setActiveTab('profile')}
           className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
