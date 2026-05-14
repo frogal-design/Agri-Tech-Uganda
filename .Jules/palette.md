@@ -1,0 +1,3 @@
+## 2025-03-14 - Interactive USSD Simulation & Card Buttons
+**Learning:** In applications targeting regions with diverse local languages (like Uganda), static USSD mockups fail to convey the "offline-first" UX. Converting these mockups into interactive simulators with regional language toggles (Luganda, Luo, Swahili) significantly improves training value. Additionally, when converting Neo-brutalist 'div' cards to 'button' elements, the `text-left` class is essential to maintain the design system's alignment, as buttons default to center.
+**Action:** Implement dynamic state for all simulator components and use semantic buttons with `text-left` for card-based selections.
