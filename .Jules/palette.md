@@ -1,0 +1,3 @@
+## 2025-03-24 - [Semantic Buttons and Navigation State]
+**Learning:** In a Neo-brutalist design system where large "cards" act as buttons, using semantic `<button>` elements instead of `<div>` with click handlers is essential for keyboard accessibility. However, standard buttons center content by default, so adding `text-left` and `w-full` is necessary to preserve the layout. Additionally, `aria-current="page"` is highly effective for identifying the active section in a bottom-navigation bar for screen readers.
+**Action:** Always prefer `<button type="button">` for clickable cards and apply `aria-current="page"` to the active item in navigation arrays.
