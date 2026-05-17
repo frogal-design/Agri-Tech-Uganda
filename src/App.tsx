@@ -238,22 +238,22 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="text-xs text-gray-500 uppercase block">Default System Language</span>
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="text-xs text-gray-500 uppercase block">Regional Standard</span>
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="text-xs text-gray-500 uppercase block">Central Region Dialect</span>
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                      <span className="text-xs text-gray-500 uppercase block">Northern Region Dialect</span>
+                    </button>
                   </div>
                 </div>
 
@@ -620,6 +620,7 @@ export default function App() {
       <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
           onClick={() => setActiveTab('prices')}
+          aria-current={activeTab === 'prices' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <TrendingUp size={24} className={activeTab === 'prices' ? 'fill-black' : ''} />
@@ -627,6 +628,7 @@ export default function App() {
         </button>
         <button 
           onClick={() => setActiveTab('ads')}
+          aria-current={activeTab === 'ads' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <Ads size={24} className={activeTab === 'ads' ? 'fill-black' : ''} />
@@ -634,6 +636,7 @@ export default function App() {
         </button>
         <button 
           onClick={() => setActiveTab('ussd')}
+          aria-current={activeTab === 'ussd' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <USSD size={24} className={activeTab === 'ussd' ? 'fill-black' : ''} />
@@ -641,6 +644,7 @@ export default function App() {
         </button>
         <button 
           onClick={() => setActiveTab('profile')}
+          aria-current={activeTab === 'profile' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <User size={24} className={activeTab === 'profile' ? 'fill-black' : ''} />
