@@ -1,0 +1,3 @@
+## 2024-05-15 - [Semantic Interactive Elements]
+**Learning:** In the Neo-brutalist design of AGRI-PULSE UG, many card-like elements are implemented as clickable `div`s, which breaks keyboard accessibility. Converting these to semantic `button` elements requires adding `text-left` to preserve alignment, as buttons default to centered text. Additionally, nested `<p>` tags within these buttons must be converted to `<span>` (with `block` utility) to maintain valid HTML structure.
+**Action:** Always audit clickable card-like elements and convert them to semantic `button` tags with `type="button"`, ensuring internal structure uses inline-friendly elements like `<span>`.
