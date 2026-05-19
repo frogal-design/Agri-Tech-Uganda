@@ -40,6 +40,7 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('ENGLISH');
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -213,18 +214,24 @@ export default function App() {
                             <span className="animate-pulse">|</span>
                           </div>
                           <div className="flex justify-between mt-2">
-                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
-                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                            <button type="button" className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold active:translate-y-0.5">Cancel</button>
+                            <button type="button" className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase active:translate-y-0.5">Send</button>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className="h-16 border-t-2 border-black flex items-center justify-around bg-white">
-                      <ArrowLeft size={20} className="text-black" />
-                      <div className="w-10 h-10 border-2 border-black rounded-full flex items-center justify-center">
-                        <div className="w-6 h-6 bg-black rounded-sm"></div>
-                      </div>
-                      <Menu size={20} className="text-black" />
+                      <button type="button" aria-label="Back" className="p-2 hover:bg-gray-100 rounded-full transition-colors active:translate-y-0.5">
+                        <ArrowLeft size={20} className="text-black" />
+                      </button>
+                      <button type="button" aria-label="Home" className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors active:translate-y-0.5">
+                        <div className="w-10 h-10 border-2 border-black rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-black rounded-sm"></div>
+                        </div>
+                      </button>
+                      <button type="button" aria-label="Menu" className="p-2 hover:bg-gray-100 rounded-full transition-colors active:translate-y-0.5">
+                        <Menu size={20} className="text-black" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -238,22 +245,26 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {[
+                      { id: 'ENGLISH', sub: 'Default System Language' },
+                      { id: 'SWAHILI', sub: 'Regional Standard' },
+                      { id: 'LUGANDA', sub: 'Central Region Dialect' },
+                      { id: 'LUO', sub: 'Northern Region Dialect' }
+                    ].map((lang) => (
+                      <button
+                        key={lang.id}
+                        type="button"
+                        onClick={() => setSelectedLanguage(lang.id)}
+                        className={`p-4 border-2 text-left transition-colors active:translate-y-0.5 ${
+                          selectedLanguage === lang.id
+                            ? 'bg-accent border-black'
+                            : 'bg-white border-black/20 hover:border-black'
+                        }`}
+                      >
+                        <span className="font-bold block mb-1 uppercase tracking-wider">{lang.id}</span>
+                        <p className="text-xs text-gray-500 uppercase">{lang.sub}</p>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -279,8 +290,8 @@ export default function App() {
                     <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
                   </div>
                   <div className="mt-6 flex gap-4">
-                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
-                    <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
+                    <button type="button" className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
+                    <button type="button" className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
                   </div>
                 </div>
               </div>
@@ -439,8 +450,16 @@ export default function App() {
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
                 ) : ads.length === 0 ? (
-                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
+                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10 flex flex-col items-center gap-6">
                     <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowPostForm(true)}
+                      className="neo-button flex items-center gap-2 h-14"
+                    >
+                      <PlusSquare size={20} />
+                      <span>Post the First Ad</span>
+                    </button>
                   </div>
                 ) : (
                   ads.map((ad, index) => (
@@ -529,7 +548,7 @@ export default function App() {
                     </button>
                     <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
                       <Search size={20} className="text-gray-400 mr-3" />
-                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                      <input aria-label="Search markets or crops" className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
                     </div>
                   </div>
                 </div>
