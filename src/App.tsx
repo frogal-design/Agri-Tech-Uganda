@@ -32,8 +32,16 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+const LANGUAGES = [
+  { id: 'en', name: 'ENGLISH', description: 'Default System Language' },
+  { id: 'sw', name: 'SWAHILI', description: 'Regional Standard' },
+  { id: 'lg', name: 'LUGANDA', description: 'Central Region Dialect' },
+  { id: 'luo', name: 'LUO', description: 'Northern Region Dialect' },
+];
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -213,8 +221,8 @@ export default function App() {
                             <span className="animate-pulse">|</span>
                           </div>
                           <div className="flex justify-between mt-2">
-                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
-                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                            <button type="button" className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold active:translate-y-0.5 transition-transform">Cancel</button>
+                            <button type="button" className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase active:translate-y-0.5 transition-transform">Send</button>
                           </div>
                         </div>
                       </div>
@@ -238,22 +246,27 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.id}
+                        type="button"
+                        aria-pressed={selectedLanguage === lang.id}
+                        onClick={() => setSelectedLanguage(lang.id)}
+                        className={`p-4 border-2 text-left transition-all relative group ${
+                          selectedLanguage === lang.id
+                            ? 'bg-accent border-black neo-shadow translate-x-[-2px] translate-y-[-2px]'
+                            : 'bg-white border-black/10 hover:border-black active:translate-y-0.5'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <span className="font-bold block mb-1 uppercase tracking-wider">{lang.name}</span>
+                          {selectedLanguage === lang.id && (
+                            <Verified size={16} className="text-black" />
+                          )}
+                        </div>
+                        <p className="text-[10px] text-gray-500 uppercase font-medium">{lang.description}</p>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
