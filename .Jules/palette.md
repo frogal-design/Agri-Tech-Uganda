@@ -1,0 +1,3 @@
+## 2025-05-14 - [Semantic Button Conversion & Proactive Empty States]
+**Learning:** In Neo-brutalist designs, interactive cards often appear as simple divs. Converting these to semantic `<button>` elements with `text-left` and tactile feedback (`active:translate-y-0.5`) significantly improves accessibility without compromising the aesthetic. Additionally, empty states should always provide a clear "Next Step" CTA to prevent user drop-off.
+**Action:** Always audit clickable divs for conversion to semantic buttons and ensure every "No results" message is accompanied by a proactive action button.
