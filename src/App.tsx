@@ -238,22 +238,22 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group text-left active:translate-y-0.5">
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="block text-xs text-gray-500 uppercase">Default System Language</span>
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left active:translate-y-0.5">
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="block text-xs text-gray-500 uppercase">Regional Standard</span>
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left active:translate-y-0.5">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="block text-xs text-gray-500 uppercase">Central Region Dialect</span>
+                    </button>
+                    <button type="button" className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer text-left active:translate-y-0.5">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                      <span className="block text-xs text-gray-500 uppercase">Northern Region Dialect</span>
+                    </button>
                   </div>
                 </div>
 
@@ -439,8 +439,15 @@ export default function App() {
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
                 ) : ads.length === 0 ? (
-                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
-                    <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10 flex flex-col items-center justify-center">
+                    <p className="font-display text-2xl font-black uppercase text-black/20 mb-8">No active advertisements found</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowPostForm(true)}
+                      className="neo-button"
+                    >
+                      POST YOUR FIRST AD
+                    </button>
                   </div>
                 ) : (
                   ads.map((ad, index) => (
@@ -619,28 +626,36 @@ export default function App() {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
+          type="button"
           onClick={() => setActiveTab('prices')}
+          aria-current={activeTab === 'prices' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <TrendingUp size={24} className={activeTab === 'prices' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
+          type="button"
           onClick={() => setActiveTab('ads')}
+          aria-current={activeTab === 'ads' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <Ads size={24} className={activeTab === 'ads' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
+          type="button"
           onClick={() => setActiveTab('ussd')}
+          aria-current={activeTab === 'ussd' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <USSD size={24} className={activeTab === 'ussd' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">USSD</span>
         </button>
         <button 
+          type="button"
           onClick={() => setActiveTab('profile')}
+          aria-current={activeTab === 'profile' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <User size={24} className={activeTab === 'profile' ? 'fill-black' : ''} />
