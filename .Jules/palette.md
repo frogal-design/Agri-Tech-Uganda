@@ -1,0 +1,3 @@
+## 2025-05-15 - Interactive Elements Semantics & Feedback
+**Learning:** In Neo-brutalist designs where cards or grid items are interactive, they are often implemented as `div` elements with hover effects but lack keyboard accessibility and tactile click feedback. Using semantic `button` elements with `type="button"` and `text-left` (to override default centering) preserves layout while improving accessibility.
+**Action:** Always convert card-like interactive elements to `button` tags. Use `active:translate-y-0.5` for tactile feedback and ensure nested text uses `<span>` instead of `<p>` to maintain valid HTML structure within the button.
