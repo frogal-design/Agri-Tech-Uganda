@@ -40,6 +40,7 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('ENGLISH');
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -238,22 +239,42 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'ENGLISH'}
+                      onClick={() => setSelectedLanguage('ENGLISH')}
+                      className={`p-4 border border-black transition-all text-left active:translate-y-0.5 ${selectedLanguage === 'ENGLISH' ? 'bg-accent' : 'bg-white hover:bg-accent/50'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
                       <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'SWAHILI'}
+                      onClick={() => setSelectedLanguage('SWAHILI')}
+                      className={`p-4 border border-black transition-all text-left active:translate-y-0.5 ${selectedLanguage === 'SWAHILI' ? 'bg-accent' : 'bg-white hover:bg-accent/50'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
                       <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'LUGANDA'}
+                      onClick={() => setSelectedLanguage('LUGANDA')}
+                      className={`p-4 border border-black transition-all text-left active:translate-y-0.5 ${selectedLanguage === 'LUGANDA' ? 'bg-accent' : 'bg-white hover:bg-accent/50'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
                       <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'LUO'}
+                      onClick={() => setSelectedLanguage('LUO')}
+                      className={`p-4 border border-black transition-all text-left active:translate-y-0.5 ${selectedLanguage === 'LUO' ? 'bg-accent' : 'bg-white hover:bg-accent/50'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
                       <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    </button>
                   </div>
                 </div>
 
