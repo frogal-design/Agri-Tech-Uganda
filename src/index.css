@@ -24,6 +24,12 @@
   }
 }
 
+@layer base {
+  *:focus-visible {
+    @apply outline-[3px] outline-black outline-offset-2;
+  }
+}
+
 @layer components {
   .neo-shadow {
     box-shadow: 4px 4px 0px 0px #000;
