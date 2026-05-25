@@ -1,0 +1,3 @@
+## 2025-03-27 - Semantic Interactivity and Programmatic State
+**Learning:** In high-contrast "Neo-brutalist" designs, visual cues alone (like bold borders or bright colors) aren't enough for accessibility. Interactive cards and language selectors implemented as `div` elements break keyboard navigation and screen reader support. Converting these to semantic `button` elements with explicit `type="button"` and `aria-pressed` or `aria-current` states ensures the UI is both visually striking and universally usable.
+**Action:** Audit the codebase for "clickable div" patterns and replace them with semantic buttons. Always pair visual active states (e.g., `bg-accent`) with programmatic attributes like `aria-current="page"`.
