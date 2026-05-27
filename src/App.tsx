@@ -32,8 +32,16 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+const MENU_TITLES: Record<string, string> = {
+  ENGLISH: 'AGRI-PULSE MAIN MENU',
+  SWAHILI: 'MENU KUU YA AGRI-PULSE',
+  LUGANDA: 'EMENU ENKULU EYA AGRI-PULSE',
+  LUO: 'YOO ME AGRI-PULSE MADIT'
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -199,7 +207,7 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">{MENU_TITLES[selectedLanguage]}</p>
                         <ul className="text-xs space-y-2 uppercase">
                           <li>1. Market Prices</li>
                           <li>2. Post Advertisement</li>
@@ -238,22 +246,25 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {[
+                      { id: 'ENGLISH', label: 'ENGLISH', sub: 'Default System Language' },
+                      { id: 'SWAHILI', label: 'SWAHILI', sub: 'Regional Standard' },
+                      { id: 'LUGANDA', label: 'LUGANDA', sub: 'Central Region Dialect' },
+                      { id: 'LUO', label: 'LUO', sub: 'Northern Region Dialect' }
+                    ].map((lang) => (
+                      <button
+                        key={lang.id}
+                        type="button"
+                        onClick={() => setSelectedLanguage(lang.id)}
+                        aria-pressed={selectedLanguage === lang.id}
+                        className={`p-4 border border-black text-left transition-all active:translate-y-0.5 ${
+                          selectedLanguage === lang.id ? 'bg-accent' : 'bg-white hover:bg-accent/10'
+                        }`}
+                      >
+                        <span className="font-bold block mb-1 uppercase tracking-wider">{lang.label}</span>
+                        <span className="text-xs text-gray-500 uppercase block">{lang.sub}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -620,20 +631,23 @@ export default function App() {
       <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
           onClick={() => setActiveTab('prices')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-current={activeTab === 'prices' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <TrendingUp size={24} className={activeTab === 'prices' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
           onClick={() => setActiveTab('ads')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-current={activeTab === 'ads' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <Ads size={24} className={activeTab === 'ads' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
           onClick={() => setActiveTab('ussd')}
+          aria-current={activeTab === 'ussd' ? 'page' : undefined}
           className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <USSD size={24} className={activeTab === 'ussd' ? 'fill-black' : ''} />
@@ -641,7 +655,8 @@ export default function App() {
         </button>
         <button 
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-current={activeTab === 'profile' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <User size={24} className={activeTab === 'profile' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Profile</span>
