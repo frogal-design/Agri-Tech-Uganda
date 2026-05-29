@@ -1,0 +1,3 @@
+## 2025-05-14 - Interactive Localized USSD Simulator
+**Learning:** When converting card-like `div` elements to semantic `button` elements for accessibility, nested `<p>` tags must be replaced with `<span>` (using `block` or `flex` for layout) to maintain valid HTML. Additionally, in simulator-style UIs (like USSD), synchronizing localized headers with selection state provides high-impact feedback for minimal code complexity.
+**Action:** Use semantic `<button type="button">` with `aria-pressed` for all selection states, and ensure internal text nodes use `<span>` for block-level layout to avoid invalid nesting of paragraph tags.
