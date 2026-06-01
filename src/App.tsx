@@ -32,8 +32,60 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+const MENU_TITLES = {
+  ENGLISH: "AGRI-PULSE MAIN MENU",
+  SWAHILI: "MENU KUU YA AGRI-PULSE",
+  LUGANDA: "MENYU ENKULU EYA AGRI-PULSE",
+  LUO: "MENYU MADIT ME AGRI-PULSE"
+};
+
+const MENU_OPTIONS = {
+  ENGLISH: [
+    "1. Market Prices",
+    "2. Post Advertisement",
+    "3. Crop Diseases",
+    "4. Weather Forecast",
+    "5. Account Settings",
+    "6. Help / Feedback"
+  ],
+  SWAHILI: [
+    "1. Bei za Soko",
+    "2. Tuma Matangazo",
+    "3. Magonjwa ya Mazao",
+    "4. Utabiri wa Hali ya Hewa",
+    "5. Mipangilio ya Akaunti",
+    "6. Msaada / Maoni"
+  ],
+  LUGANDA: [
+    "1. Ebei z'ebirime",
+    "2. Tekayo akalango",
+    "3. Obulwadde bw'ebirime",
+    "4. Embeera y'obudde",
+    "5. Enteekateeka ya akawunti",
+    "6. Obuyambi / Okuddamu"
+  ],
+  LUO: [
+    "1. Wel Pur",
+    "2. Keto Lanyut",
+    "3. Too me Pur",
+    "4. Kit me Yamo",
+    "5. Yub me Akaunt",
+    "6. Kony / Tam"
+  ]
+};
+
+const LANGUAGES = [
+  { id: 'ENGLISH', label: 'ENGLISH', sub: 'Default System Language' },
+  { id: 'SWAHILI', label: 'SWAHILI', sub: 'Regional Standard' },
+  { id: 'LUGANDA', label: 'LUGANDA', sub: 'Central Region Dialect' },
+  { id: 'LUO', label: 'LUO', sub: 'Northern Region Dialect' }
+] as const;
+
+type Language = typeof LANGUAGES[number]['id'];
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -199,14 +251,13 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">
+                          {MENU_TITLES[selectedLanguage]}
+                        </p>
                         <ul className="text-xs space-y-2 uppercase">
-                          <li>1. Market Prices</li>
-                          <li>2. Post Advertisement</li>
-                          <li>3. Crop Diseases</li>
-                          <li>4. Weather Forecast</li>
-                          <li>5. Account Settings</li>
-                          <li>6. Help / Feedback</li>
+                          {MENU_OPTIONS[selectedLanguage].map((option, idx) => (
+                            <li key={idx}>{option}</li>
+                          ))}
                         </ul>
                         <div className="mt-8">
                           <div className="border-b-2 border-black w-full h-8 flex items-center">
@@ -238,22 +289,24 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.id}
+                        type="button"
+                        aria-pressed={selectedLanguage === lang.id}
+                        onClick={() => setSelectedLanguage(lang.id)}
+                        className={`p-4 border-2 border-black text-left transition-all active:translate-y-0.5 ${
+                          selectedLanguage === lang.id
+                            ? 'bg-accent shadow-none translate-y-0.5'
+                            : 'bg-white hover:bg-accent/30'
+                        }`}
+                      >
+                        <span className="font-bold block mb-1 uppercase tracking-wider">{lang.label}</span>
+                        <span className="text-[10px] text-gray-500 uppercase block font-medium leading-tight">
+                          {lang.sub}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
