@@ -1,0 +1,3 @@
+## 2025-05-15 - [Accessible Language Selection in Neo-brutalist UI]
+**Learning:** For language selection grids in a Neo-brutalist design system, converting static `div` placeholders into semantic `button` elements with `aria-pressed` provides immediate accessibility and keyboard navigation. Adding a tactile transform like `active:translate-y-0.5` significantly enhances the "clicky" feel consistent with the bold, high-contrast aesthetic.
+**Action:** Always use semantic `<button>` tags with `type="button"` and `aria-pressed` for selection groups, and synchronize simulator mockups with application state to provide a realistic "live preview" experience.
