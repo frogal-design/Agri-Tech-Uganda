@@ -439,8 +439,16 @@ export default function App() {
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
                 ) : ads.length === 0 ? (
-                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
+                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10 flex flex-col items-center gap-6">
                     <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                    <button
+                      onClick={() => setShowPostForm(true)}
+                      className="neo-button h-14 font-bold flex items-center gap-2"
+                      type="button"
+                    >
+                      <PlusSquare size={20} />
+                      <span>Post an Ad</span>
+                    </button>
                   </div>
                 ) : (
                   ads.map((ad, index) => (
