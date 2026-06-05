@@ -10,6 +10,8 @@ export interface Ad {
   type: 'selling' | 'buying' | 'service';
 }
 
+export type Language = 'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO';
+
 export interface MarketPrice {
   id: string;
   date: string;
