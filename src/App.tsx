@@ -23,8 +23,15 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from './lib/supabase';
-import { Ad, MarketPrice } from './types';
+import { Ad, MarketPrice, Language } from './types';
 import { refreshMarketPrices } from './services/marketService';
+
+const USSD_MENU_HEADERS: Record<Language, string> = {
+  ENGLISH: 'AGRI-PULSE MAIN MENU',
+  SWAHILI: 'MENU KUU YA AGRI-PULSE',
+  LUGANDA: 'MENYU ENKULU EYA AGRI-PULSE',
+  LUO: 'MENYU MADIT ME AGRI-PULSE'
+};
 
 const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
 const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
@@ -34,6 +41,7 @@ const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e0
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,10 +164,10 @@ export default function App() {
             <Search size={18} className="text-black" />
             <input aria-label="Search marketplace" className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
           </div>
-          <button aria-label="Change language" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+          <button type="button" aria-label="Change language" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <Languages size={20} className="text-black" />
           </button>
-          <button aria-label="User profile" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
+          <button type="button" aria-label="User profile" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <User size={20} className="text-black" />
           </button>
         </div>
@@ -199,7 +207,7 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">{USSD_MENU_HEADERS[selectedLanguage]}</p>
                         <ul className="text-xs space-y-2 uppercase">
                           <li>1. Market Prices</li>
                           <li>2. Post Advertisement</li>
@@ -213,8 +221,8 @@ export default function App() {
                             <span className="animate-pulse">|</span>
                           </div>
                           <div className="flex justify-between mt-2">
-                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
-                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                            <button type="button" className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold active:translate-y-0.5 transition-transform">Cancel</button>
+                            <button type="button" className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase active:translate-y-0.5 transition-transform">Send</button>
                           </div>
                         </div>
                       </div>
@@ -238,22 +246,42 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedLanguage('ENGLISH')}
+                      aria-pressed={selectedLanguage === 'ENGLISH'}
+                      className={`p-4 border border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'ENGLISH' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="text-xs text-gray-500 uppercase block">Default System Language</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedLanguage('SWAHILI')}
+                      aria-pressed={selectedLanguage === 'SWAHILI'}
+                      className={`p-4 border border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'SWAHILI' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="text-xs text-gray-500 uppercase block">Regional Standard</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedLanguage('LUGANDA')}
+                      aria-pressed={selectedLanguage === 'LUGANDA'}
+                      className={`p-4 border border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'LUGANDA' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                      <span className="text-xs text-gray-500 uppercase block">Central Region Dialect</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedLanguage('LUO')}
+                      aria-pressed={selectedLanguage === 'LUO'}
+                      className={`p-4 border border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'LUO' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                      <span className="text-xs text-gray-500 uppercase block">Northern Region Dialect</span>
+                    </button>
                   </div>
                 </div>
 
@@ -312,6 +340,7 @@ export default function App() {
                   </p>
                 </div>
                 <button 
+                  type="button"
                   onClick={() => setShowPostForm(true)}
                   className="neo-button flex items-center gap-2 h-14"
                 >
@@ -425,11 +454,11 @@ export default function App() {
               </AnimatePresence>
 
               <section className="flex flex-wrap gap-4 mb-12">
-                <button className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest">All Listings</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Tractors</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Irrigation</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Fertilizer</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Livestock</button>
+                <button type="button" className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest active:translate-y-0.5 transition-all">All Listings</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent active:translate-y-0.5 transition-all">Tractors</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent active:translate-y-0.5 transition-all">Irrigation</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent active:translate-y-0.5 transition-all">Fertilizer</button>
+                <button type="button" className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent active:translate-y-0.5 transition-all">Livestock</button>
               </section>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -439,8 +468,16 @@ export default function App() {
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
                 ) : ads.length === 0 ? (
-                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
+                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10 flex flex-col items-center gap-6">
                     <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowPostForm(true)}
+                      className="neo-button flex items-center gap-2 h-14"
+                    >
+                      <PlusSquare size={20} />
+                      <span>Post an Ad</span>
+                    </button>
                   </div>
                 ) : (
                   ads.map((ad, index) => (
@@ -478,7 +515,7 @@ export default function App() {
                             <div className="flex justify-between items-end">
                               <span className="font-display font-black text-2xl">UGX {ad.price || 'Negotiable'}</span>
                               <div className="flex gap-2">
-                                <button className="h-10 px-4 border-2 border-black font-black uppercase text-[10px] hover:bg-black hover:text-white transition-colors">Details</button>
+                                <button type="button" className="h-10 px-4 border-2 border-black font-black uppercase text-[10px] hover:bg-black hover:text-white active:translate-y-0.5 transition-all">Details</button>
                               </div>
                             </div>
                             <div className="bg-accent/20 border-2 border-black p-3 flex items-center gap-3">
@@ -520,9 +557,10 @@ export default function App() {
                   <h1 className="font-display text-3xl font-black uppercase tracking-tighter italic">Wholesale Market Prices</h1>
                   <div className="w-full md:w-auto flex items-center gap-4">
                     <button 
+                      type="button"
                       onClick={handleRefreshPrices}
                       disabled={refreshing}
-                      className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-xs tracking-widest hover:bg-accent transition-colors flex items-center gap-2 h-12"
+                      className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-xs tracking-widest hover:bg-accent active:translate-y-0.5 transition-all flex items-center gap-2 h-12"
                     >
                       <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
                       <span>{refreshing ? 'Searching...' : 'Refresh Live Prices'}</span>
@@ -579,9 +617,9 @@ export default function App() {
                 </div>
 
                 <div className="p-6 bg-gray-50 flex justify-center items-center gap-8 border-t-2 border-black">
-                  <button className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">PREVIOUS</button>
+                  <button type="button" className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-0.5 active:translate-y-0 active:bg-accent transition-all">PREVIOUS</button>
                   <span className="font-black italic tracking-widest text-sm">PAGE 1 OF 12</span>
-                  <button className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-1 active:translate-y-0 active:bg-accent transition-all">NEXT</button>
+                  <button type="button" className="border-2 border-black bg-white px-6 py-2 font-black uppercase text-xs hover:translate-y-0.5 active:translate-y-0 active:bg-accent transition-all">NEXT</button>
                 </div>
               </section>
 
@@ -591,7 +629,7 @@ export default function App() {
                   <p className="text-lg font-medium text-gray-600 mb-8 leading-relaxed">
                     Accurate market information helps you negotiate better prices at the farm gate. Our data is updated daily from major hubs across Uganda.
                   </p>
-                  <button className="bg-sky-blue text-white border-2 border-black py-4 font-display font-black uppercase tracking-[0.2em] hover:bg-black transition-all active:translate-y-1">
+                  <button type="button" className="bg-sky-blue text-white border-2 border-black py-4 font-display font-black uppercase tracking-[0.2em] hover:bg-black active:translate-y-0.5 transition-all">
                     GET SMS ALERTS
                   </button>
                 </div>
