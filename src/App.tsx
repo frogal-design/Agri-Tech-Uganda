@@ -32,8 +32,58 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+type Language = 'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO';
+
+const USSD_MENU_ITEMS: Record<Language, { header: string; items: string[] }> = {
+  ENGLISH: {
+    header: 'AGRI-PULSE MAIN MENU',
+    items: [
+      '1. Market Prices',
+      '2. Post Advertisement',
+      '3. Crop Diseases',
+      '4. Weather Forecast',
+      '5. Account Settings',
+      '6. Help / Feedback'
+    ]
+  },
+  SWAHILI: {
+    header: 'MENU KUU YA AGRI-PULSE',
+    items: [
+      '1. Bei za Soko',
+      '2. Tuma Tangazo',
+      '3. Magonjwa ya Mazao',
+      '4. Utabiri wa Hali ya Hewa',
+      '5. Mipangilio ya Akaunti',
+      '6. Msaada / Maoni'
+    ]
+  },
+  LUGANDA: {
+    header: 'MENYU ENKULU EYA AGRI-PULSE',
+    items: [
+      '1. Emiwendo gy\' akatale',
+      '2. Teekawo ekirango',
+      '3. Endwadde z\'ebirime',
+      '4. Okuteebereza kw\'obudde',
+      '5. Enteekateeka z\'akawunti',
+      '6. Buyambi / Okuddamu'
+    ]
+  },
+  LUO: {
+    header: 'MENYU MADIT ME AGRI-PULSE',
+    items: [
+      '1. Wel tic me cuk',
+      '2. Keto lanyut',
+      '3. Two me pur',
+      '4. Kor piny',
+      '5. Yub me akaunt',
+      '6. Kony / Tam'
+    ]
+  }
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -199,14 +249,13 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">
+                          {USSD_MENU_ITEMS[selectedLanguage].header}
+                        </p>
                         <ul className="text-xs space-y-2 uppercase">
-                          <li>1. Market Prices</li>
-                          <li>2. Post Advertisement</li>
-                          <li>3. Crop Diseases</li>
-                          <li>4. Weather Forecast</li>
-                          <li>5. Account Settings</li>
-                          <li>6. Help / Feedback</li>
+                          {USSD_MENU_ITEMS[selectedLanguage].items.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
                         </ul>
                         <div className="mt-8">
                           <div className="border-b-2 border-black w-full h-8 flex items-center">
@@ -238,22 +287,42 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'ENGLISH'}
+                      onClick={() => setSelectedLanguage('ENGLISH')}
+                      className={`p-4 border-2 border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'ENGLISH' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
                       <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'SWAHILI'}
+                      onClick={() => setSelectedLanguage('SWAHILI')}
+                      className={`p-4 border-2 border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'SWAHILI' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
                       <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'LUGANDA'}
+                      onClick={() => setSelectedLanguage('LUGANDA')}
+                      className={`p-4 border-2 border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'LUGANDA' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
                       <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={selectedLanguage === 'LUO'}
+                      onClick={() => setSelectedLanguage('LUO')}
+                      className={`p-4 border-2 border-black text-left hover:bg-accent transition-colors active:translate-y-0.5 ${selectedLanguage === 'LUO' ? 'bg-accent' : 'bg-white'}`}
+                    >
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
                       <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    </button>
                   </div>
                 </div>
 
