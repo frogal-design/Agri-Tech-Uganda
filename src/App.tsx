@@ -34,6 +34,7 @@ const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e0
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState<'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO'>('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -199,7 +200,12 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">
+                          {selectedLanguage === 'SWAHILI' ? 'MENU KUU YA AGRI-PULSE' :
+                           selectedLanguage === 'LUGANDA' ? 'MENYU ENKULU EYA AGRI-PULSE' :
+                           selectedLanguage === 'LUO' ? 'MENYU MADIT ME AGRI-PULSE' :
+                           'AGRI-PULSE MAIN MENU'}
+                        </p>
                         <ul className="text-xs space-y-2 uppercase">
                           <li>1. Market Prices</li>
                           <li>2. Post Advertisement</li>
@@ -238,22 +244,23 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {[
+                      { code: 'ENGLISH', name: 'ENGLISH', desc: 'Default System Language' },
+                      { code: 'SWAHILI', name: 'SWAHILI', desc: 'Regional Standard' },
+                      { code: 'LUGANDA', name: 'LUGANDA', desc: 'Central Region Dialect' },
+                      { code: 'LUO', name: 'LUO', desc: 'Northern Region Dialect' }
+                    ].map((lang) => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        aria-pressed={selectedLanguage === lang.code}
+                        onClick={() => setSelectedLanguage(lang.code as any)}
+                        className={`p-4 border-2 border-black text-left transition-all active:translate-y-0.5 hover:bg-accent ${selectedLanguage === lang.code ? 'bg-accent shadow-none' : 'bg-white neo-shadow'}`}
+                      >
+                        <span className="font-bold block mb-1 uppercase tracking-wider">{lang.name}</span>
+                        <span className="text-xs text-gray-500 uppercase block">{lang.desc}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
