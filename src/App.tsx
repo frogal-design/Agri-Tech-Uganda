@@ -26,6 +26,15 @@ import { supabase } from './lib/supabase';
 import { Ad, MarketPrice } from './types';
 import { refreshMarketPrices } from './services/marketService';
 
+type Language = 'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO';
+
+const TRANSLATIONS: Record<Language, string> = {
+  ENGLISH: 'AGRI-PULSE MAIN MENU',
+  SWAHILI: 'MENU KUU YA AGRI-PULSE',
+  LUGANDA: 'MENYU ENKULU EYA AGRI-PULSE',
+  LUO: 'MENYU MADIT ME AGRI-PULSE',
+};
+
 const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
 const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
 const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qYFfsS7J-Jr26daBwCALYk9cN1C1dKSSLaJnMxviFJ74NgDnxKLFLTkjjhmOzj5U-Whcxj8WxyK8cybSwWw3yWMDc-Xq35WFhQ51CSWzvP7VpMP3qoeB81susixmbszkj_4FKhQRS5-8UhWAjdLcd5Mix7aIglI8G_hy-1Cp12Ffa0NIEFaMbFtcEy2vReV3hwSNE4UNsgESQwSD8kbq9s8jpQHrqTDOXeU9lGWF_XOQHw_ue62RNMPSJnoxaQ5aim_q86a";
@@ -34,6 +43,7 @@ const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e0
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -199,7 +209,7 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">{TRANSLATIONS[selectedLanguage]}</p>
                         <ul className="text-xs space-y-2 uppercase">
                           <li>1. Market Prices</li>
                           <li>2. Post Advertisement</li>
@@ -238,22 +248,25 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {(['ENGLISH', 'SWAHILI', 'LUGANDA', 'LUO'] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => setSelectedLanguage(lang)}
+                        aria-pressed={selectedLanguage === lang}
+                        className={`p-4 border-2 border-black text-left transition-all active:translate-y-0.5 hover:bg-accent/50 ${
+                          selectedLanguage === lang ? 'bg-accent neo-shadow' : 'bg-white'
+                        }`}
+                      >
+                        <span className="font-bold block mb-1 uppercase tracking-wider">{lang}</span>
+                        <p className="text-[10px] text-gray-500 uppercase font-black">
+                          {lang === 'ENGLISH' && 'Default System Language'}
+                          {lang === 'SWAHILI' && 'Regional Standard'}
+                          {lang === 'LUGANDA' && 'Central Region Dialect'}
+                          {lang === 'LUO' && 'Northern Region Dialect'}
+                        </p>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -439,8 +452,15 @@ export default function App() {
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
                 ) : ads.length === 0 ? (
-                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
+                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10 flex flex-col items-center gap-6">
                     <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                    <button
+                      onClick={() => setShowPostForm(true)}
+                      className="neo-button flex items-center gap-2 h-14"
+                    >
+                      <PlusSquare size={20} />
+                      <span>Post an Ad</span>
+                    </button>
                   </div>
                 ) : (
                   ads.map((ad, index) => (
