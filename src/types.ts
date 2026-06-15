@@ -20,3 +20,5 @@ export interface MarketPrice {
   change: string;
   trend: 'up' | 'down' | 'stable';
 }
+
+export type Language = 'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO';
