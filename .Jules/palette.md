@@ -1,0 +1,3 @@
+## 2025-02-23 - [Interactive Simulator Localization and a11y]
+**Learning:** Purely visual simulation mockups can cause severe accessibility issues if represented as simple layout tags (like `div` or `li`) without semantic keyboard roles, especially when user choices in side panels are decoupled from the simulation. Standardizing mockups to use `button` tags with proper ARIA attributes (`aria-pressed`), and using technical output logs marked as `role="log"` with `aria-live="polite"`, bridges this gap seamlessly.
+**Action:** Always refactor mockup buttons to be interactive, semantic elements, synchronize simulator displays with centralized states, and annotate debug logs using aria-live to ensure asynchronous updates are clearly announced by assistive technologies.
