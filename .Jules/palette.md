@@ -1,0 +1,3 @@
+## 2025-07-23 - Interactive Simulator UI Feedback Loop
+**Learning:** For terminal or hardware simulator widgets, synchronizing user selection state with a mock visual screen and a live debug console region greatly increases both user engagement and accessibility. Using `role="log"` and `aria-live="polite"` on the log container ensures that screen readers are immediately notified of background system updates or simulated network/handshake messages without interrupting focus flow.
+**Action:** Always wrap state-based simulated outputs in proper live regions, use `aria-pressed` to indicate active choices, and map tactile actions (like Send, Cancel, or language toggles) to direct visual and logged responses.
