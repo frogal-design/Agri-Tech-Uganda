@@ -1,0 +1,3 @@
+## 2025-02-14 - Accessible Simulator State Synchronization
+**Learning:** Interactive technical/offline-first simulators (like USSD mockups) often use purely static visual markers. Elevating these into interactive components not only adds delightful, immediate localized feedback, but transforming them into semantic `<button>` elements with `aria-pressed` state properties ensures screen readers and assistive technology receive synchronized technical state updates.
+**Action:** When designing mockups/simulators, avoid static `div` layouts with `cursor-pointer`. Instead, leverage semantic HTML elements combined with centralized translation lookup objects matching the active component state.
