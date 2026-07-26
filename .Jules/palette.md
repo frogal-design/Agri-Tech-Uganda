@@ -1,0 +1,3 @@
+## 2025-02-14 - Interactive USSD State Synchronization and Technical Log Accessibility
+**Learning:** In simulations or complex interactive components (e.g., the USSD simulator), synchronizing the visual mockup with centralized application state (like the selected language) provides immediate feedback that reinforces the utility of selected settings. Using a standard `role='log'` and `aria-live='polite'` on technical logs ensures screen readers are asynchronously notified of state changes without interrupting user workflow.
+**Action:** Always use centralized state and lookup maps (e.g., `Record<Language, string>`) to drive localized feedback in UI mockups, and use semantic log roles for diagnostic outputs next time.
