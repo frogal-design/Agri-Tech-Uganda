@@ -1,0 +1,3 @@
+## 2025-02-12 - USSD Simulator Micro-UX and Interactive Accessibility
+**Learning:** Purely decorative simulator indicators, like blinking text cursors, can confuse screen readers if not properly managed. Applying `aria-hidden="true"` avoids this. Additionally, using standard `div` elements for state switching in simulators excludes keyboard navigation and misses screen reader state communication. Using semantic `<button>` tags with `aria-pressed` ensures proper focus, tab order, and active state communication.
+**Action:** When designing mock/simulation interfaces, always wrap decorative markers in `aria-hidden="true"`, utilize semantic `<button>` wrappers for mock controls, and synchronize technical feedback logs via `role="log"` and `aria-live="polite"`.
