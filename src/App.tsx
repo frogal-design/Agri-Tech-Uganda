@@ -32,6 +32,53 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+const USSD_MENUS = {
+  en: {
+    header: "AGRI-PULSE MAIN MENU",
+    items: [
+      "1. Market Prices",
+      "2. Post Advertisement",
+      "3. Crop Diseases",
+      "4. Weather Forecast",
+      "5. Account Settings",
+      "6. Help / Feedback"
+    ]
+  },
+  sw: {
+    header: "MENU KUU YA AGRI-PULSE",
+    items: [
+      "1. Bei za Soko",
+      "2. Weka Tangazo",
+      "3. Magonjwa ya Mazao",
+      "4. Utabiri wa Hali ya Hewa",
+      "5. Mipangilio",
+      "6. Msaada"
+    ]
+  },
+  lg: {
+    header: "AGRI-PULSE EBYOKUKOLA",
+    items: [
+      "1. Eby'obusuubuzi",
+      "2. Teekawo ekirango",
+      "3. Endwadde z'ebirime",
+      "4. Obudde",
+      "5. Enteekateeka",
+      "6. Buyambi"
+    ]
+  },
+  luo: {
+    header: "AGRI-PULSE MENY_U MADIT",
+    items: [
+      "1. Wel me Pur",
+      "2. Ket Lango",
+      "3. Two me Anyigirime",
+      "4. Koot",
+      "5. Yub",
+      "6. Kony"
+    ]
+  }
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
   const [ads, setAds] = useState<Ad[]>([]);
@@ -40,6 +87,41 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  // USSD Interactive Simulator State
+  const [ussdLanguage, setUssdLanguage] = useState<'en' | 'sw' | 'lg' | 'luo'>('en');
+  const [ussdLogs, setUssdLogs] = useState<string[]>([
+    'SESSION_START ID: 98221-UA',
+    'POLLING GSM_NETWORK: OK',
+    'HANDSHAKE *135#: SUCCESS',
+    'RENDER_MENU: STEP_2_MAIN_OPTIONS'
+  ]);
+
+  const handleLanguageChange = (lang: 'en' | 'sw' | 'lg' | 'luo') => {
+    setUssdLanguage(lang);
+    setUssdLogs(prev => [...prev.slice(-9), `LANGUAGE_SET: ${lang.toUpperCase()}`]);
+  };
+
+  const handleResetSession = () => {
+    setUssdLanguage('en');
+    setUssdLogs([
+      'SESSION_START ID: 98221-UA',
+      'POLLING GSM_NETWORK: OK',
+      'HANDSHAKE *135#: SUCCESS',
+      'RENDER_MENU: STEP_2_MAIN_OPTIONS'
+    ]);
+  };
+
+  const handleDownloadLogs = () => {
+    const text = ussdLogs.map(l => `> ${l}`).join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ussd-session-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +141,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes' as any, { event: '*', table: 'ads' } as any, (payload: any) => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -199,22 +281,31 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">
+                          {USSD_MENUS[ussdLanguage].header}
+                        </p>
                         <ul className="text-xs space-y-2 uppercase">
-                          <li>1. Market Prices</li>
-                          <li>2. Post Advertisement</li>
-                          <li>3. Crop Diseases</li>
-                          <li>4. Weather Forecast</li>
-                          <li>5. Account Settings</li>
-                          <li>6. Help / Feedback</li>
+                          {USSD_MENUS[ussdLanguage].items.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
                         </ul>
                         <div className="mt-8">
                           <div className="border-b-2 border-black w-full h-8 flex items-center">
-                            <span className="animate-pulse">|</span>
+                            <span className="animate-pulse" aria-hidden="true">|</span>
                           </div>
                           <div className="flex justify-between mt-2">
-                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
-                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                            <button
+                              onClick={() => setUssdLogs(prev => [...prev.slice(-9), 'SESSION_TERMINATED'])}
+                              className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold active:translate-y-0.5 transition-transform"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => setUssdLogs(prev => [...prev.slice(-9), 'USER_SUBMISSION_TRIGGERED'])}
+                              className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase active:translate-y-0.5 transition-transform"
+                            >
+                              Send
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -238,22 +329,25 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {[
+                      { code: 'en', name: 'ENGLISH', desc: 'Default System Language' },
+                      { code: 'sw', name: 'SWAHILI', desc: 'Regional Standard' },
+                      { code: 'lg', name: 'LUGANDA', desc: 'Central Region Dialect' },
+                      { code: 'luo', name: 'LUO', desc: 'Northern Region Dialect' }
+                    ].map(lang => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        aria-pressed={ussdLanguage === lang.code}
+                        onClick={() => handleLanguageChange(lang.code as any)}
+                        className={`p-4 border-2 border-black text-left transition-colors active:translate-y-0.5 outline-none focus-visible:ring-2 focus-visible:ring-black ${
+                          ussdLanguage === lang.code ? 'bg-accent' : 'bg-white hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="font-bold block mb-1 uppercase tracking-wider">{lang.name}</span>
+                        <p className="text-xs text-gray-500 uppercase">{lang.desc}</p>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -272,15 +366,24 @@ export default function App() {
 
                 <div className="bg-primary text-white p-6 border-2 border-black neo-shadow">
                   <h4 className="font-bold uppercase text-accent mb-4 tracking-[0.2em] italic">DEBUG CONSOLE</h4>
-                  <div className="font-mono text-xs space-y-1 opacity-80">
-                    <p>&gt; SESSION_START ID: 98221-UA</p>
-                    <p>&gt; POLLING GSM_NETWORK: OK</p>
-                    <p>&gt; HANDSHAKE *135#: SUCCESS</p>
-                    <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
+                  <div className="font-mono text-xs space-y-1 opacity-80 h-28 overflow-y-auto" role="log" aria-live="polite">
+                    {ussdLogs.map((log, index) => (
+                      <p key={index}>&gt; {log}</p>
+                    ))}
                   </div>
-                  <div className="mt-6 flex gap-4">
-                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
-                    <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
+                  <div className="mt-6 flex gap-4 flex-wrap">
+                    <button
+                      onClick={handleResetSession}
+                      className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-0.5 hover:translate-y-0.5 active:translate-y-1 transition-all text-xs uppercase"
+                    >
+                      REFRESH SESSION
+                    </button>
+                    <button
+                      onClick={handleDownloadLogs}
+                      className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black hover:translate-x-0.5 hover:translate-y-0.5 active:translate-y-1 transition-all text-xs uppercase"
+                    >
+                      DOWNLOAD LOGS
+                    </button>
                   </div>
                 </div>
               </div>
