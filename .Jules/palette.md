@@ -1,0 +1,3 @@
+## 2025-02-18 - USSD Simulator Interactivity and Accessibility
+**Learning:** Visual-only simulator components (like `div`s with `cursor-pointer`) are highly inaccessible to keyboard users and screen readers. Simulators must use semantic `<button>` tags with explicit `aria-pressed` states, proper focus indicators, and custom tactile animations (e.g. active translation utilities). Additionally, terminal or console outputs should use `role="log"` and `aria-live="polite"` so screen readers dynamically announce log entries without stealing focus.
+**Action:** Always replace mock visual elements in interactive dashboards and simulators with semantic interactive elements, ensuring assistive tech support and tactile feedback match the layout's aesthetic.
