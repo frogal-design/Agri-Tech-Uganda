@@ -19,12 +19,19 @@ import {
   Verified,
   X,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from './lib/supabase';
 import { Ad, MarketPrice } from './types';
 import { refreshMarketPrices } from './services/marketService';
+import {
+  LANGUAGES,
+  USSD_MENU_HEADERS,
+  USSD_MENU_ITEMS,
+  Language
+} from './constants/ussd';
 
 const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
 const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
@@ -41,6 +48,15 @@ export default function App() {
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // USSD Simulator State
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('ENGLISH');
+  const [ussdLogs, setUssdLogs] = useState<string[]>([
+    ' > SESSION_START ID: 98221-UA',
+    ' > POLLING GSM_NETWORK: OK',
+    ' > HANDSHAKE *135#: SUCCESS',
+    ' > RENDER_MENU: STEP_2_MAIN_OPTIONS'
+  ]);
+
   // Form State
   const [newAd, setNewAd] = useState({
     title: '',
@@ -51,6 +67,45 @@ export default function App() {
     type: 'selling' as 'selling' | 'buying' | 'service'
   });
 
+  const appendUssdLog = (log: string) => {
+    setUssdLogs(prev => [...prev.slice(-10), ` > ${log}`]);
+  };
+
+  const handleLanguageChange = (lang: Language) => {
+    setSelectedLanguage(lang);
+    appendUssdLog(`LANGUAGE_SET: ${lang}`);
+  };
+
+  const handleUssdCancel = () => {
+    appendUssdLog('SESSION_TERMINATED');
+  };
+
+  const handleUssdSend = () => {
+    appendUssdLog('ACTION_SENT: RE-DIALING...');
+  };
+
+  const handleResetSession = () => {
+    setUssdLogs([
+      ' > SESSION_START ID: 98221-UA',
+      ' > POLLING GSM_NETWORK: OK',
+      ' > HANDSHAKE *135#: SUCCESS',
+      ' > RENDER_MENU: STEP_2_MAIN_OPTIONS'
+    ]);
+  };
+
+  const handleDownloadLogs = () => {
+    const text = ussdLogs.join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ussd_session_${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     fetchInitialData();
     
@@ -59,7 +114,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes' as any, { event: '*', table: 'ads' }, (payload: any) => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -199,22 +254,31 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">{USSD_MENU_HEADERS[selectedLanguage]}</p>
                         <ul className="text-xs space-y-2 uppercase">
-                          <li>1. Market Prices</li>
-                          <li>2. Post Advertisement</li>
-                          <li>3. Crop Diseases</li>
-                          <li>4. Weather Forecast</li>
-                          <li>5. Account Settings</li>
-                          <li>6. Help / Feedback</li>
+                          {USSD_MENU_ITEMS[selectedLanguage].map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
                         </ul>
                         <div className="mt-8">
                           <div className="border-b-2 border-black w-full h-8 flex items-center">
-                            <span className="animate-pulse">|</span>
+                            <span className="animate-pulse" aria-hidden="true">|</span>
                           </div>
                           <div className="flex justify-between mt-2">
-                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
-                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                            <button
+                              onClick={handleUssdCancel}
+                              aria-label="Cancel session"
+                              className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold hover:bg-gray-800 transition-colors cursor-pointer"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleUssdSend}
+                              aria-label="Send action"
+                              className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase hover:bg-accent/80 transition-colors cursor-pointer"
+                            >
+                              Send
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -238,22 +302,23 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {LANGUAGES.map((langOption) => {
+                      const isActive = selectedLanguage === langOption.code;
+                      return (
+                        <button
+                          key={langOption.code}
+                          onClick={() => handleLanguageChange(langOption.code)}
+                          aria-pressed={isActive}
+                          aria-label={`Select ${langOption.name} language`}
+                          className={`p-4 border-2 border-black text-left transition-all active:translate-y-0.5 cursor-pointer flex flex-col justify-start h-24 ${
+                            isActive ? 'bg-accent' : 'bg-white hover:bg-accent/10'
+                          }`}
+                        >
+                          <span className="font-bold block mb-1 uppercase tracking-wider text-black">{langOption.name}</span>
+                          <p className="text-[10px] text-gray-500 uppercase font-medium">{langOption.description}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -270,17 +335,33 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="bg-primary text-white p-6 border-2 border-black neo-shadow">
+                <div
+                  role="log"
+                  aria-live="polite"
+                  className="bg-primary text-white p-6 border-2 border-black neo-shadow"
+                >
                   <h4 className="font-bold uppercase text-accent mb-4 tracking-[0.2em] italic">DEBUG CONSOLE</h4>
-                  <div className="font-mono text-xs space-y-1 opacity-80">
-                    <p>&gt; SESSION_START ID: 98221-UA</p>
-                    <p>&gt; POLLING GSM_NETWORK: OK</p>
-                    <p>&gt; HANDSHAKE *135#: SUCCESS</p>
-                    <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
+                  <div className="font-mono text-xs space-y-1 opacity-80 h-32 overflow-y-auto">
+                    {ussdLogs.map((log, idx) => (
+                      <p key={idx}>{log}</p>
+                    ))}
                   </div>
-                  <div className="mt-6 flex gap-4">
-                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
-                    <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
+                  <div className="mt-6 flex flex-wrap gap-4">
+                    <button
+                      onClick={handleResetSession}
+                      aria-label="Refresh USSD Session"
+                      className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all cursor-pointer h-12 flex items-center justify-center"
+                    >
+                      REFRESH SESSION
+                    </button>
+                    <button
+                      onClick={handleDownloadLogs}
+                      aria-label="Download session logs"
+                      className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all cursor-pointer h-12 flex items-center justify-center gap-2"
+                    >
+                      <Download size={16} />
+                      <span>DOWNLOAD LOGS</span>
+                    </button>
                   </div>
                 </div>
               </div>
