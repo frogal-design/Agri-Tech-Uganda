@@ -32,6 +32,57 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+type Language = 'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO';
+
+const LANGUAGES_LIST: { id: Language; label: string; desc: string }[] = [
+  { id: 'ENGLISH', label: 'ENGLISH', desc: 'Default System Language' },
+  { id: 'SWAHILI', label: 'SWAHILI', desc: 'Regional Standard' },
+  { id: 'LUGANDA', label: 'LUGANDA', desc: 'Central Region Dialect' },
+  { id: 'LUO', label: 'LUO', desc: 'Northern Region Dialect' },
+];
+
+const USSD_MENU_HEADERS: Record<Language, string> = {
+  ENGLISH: "AGRI-PULSE MAIN MENU",
+  SWAHILI: "MENU KUU YA AGRI-PULSE",
+  LUGANDA: "MENU ENKULU EYA AGRI-PULSE",
+  LUO: "YOO ME AGRI-PULSE"
+};
+
+const USSD_MENU_ITEMS: Record<Language, string[]> = {
+  ENGLISH: [
+    "1. Market Prices",
+    "2. Post Advertisement",
+    "3. Crop Diseases",
+    "4. Weather Forecast",
+    "5. Account Settings",
+    "6. Help / Feedback"
+  ],
+  SWAHILI: [
+    "1. Bei za Soko",
+    "2. Weka Tangazo",
+    "3. Magonjwa ya Mazao",
+    "4. Utabiri wa Hali ya Hewa",
+    "5. Mipangilio ya Akaunti",
+    "6. Msaada / Maoni"
+  ],
+  LUGANDA: [
+    "1. Eby'obusuubuzi",
+    "2. Teekawo ekirango",
+    "3. Obulwadde bw'ebirime",
+    "4. Okukula kw'obudde",
+    "5. Enteekateeka z'akawunti",
+    "6. Obuyambi / Okusembya"
+  ],
+  LUO: [
+    "1. Wel me Pur",
+    "2. Ket Lanyut",
+    "3. Two me Anyigirime",
+    "4. Kot ki Yamo",
+    "5. Tic me Akawunt",
+    "6. Kony / Pwoyo"
+  ]
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
   const [ads, setAds] = useState<Ad[]>([]);
@@ -40,6 +91,16 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  // USSD Simulator State
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('ENGLISH');
+  const [ussdInput, setUssdInput] = useState('');
+  const [ussdLogs, setUssdLogs] = useState<string[]>([
+    '> SESSION_START ID: 98221-UA',
+    '> POLLING GSM_NETWORK: OK',
+    '> HANDSHAKE *135#: SUCCESS',
+    '> RENDER_MENU: STEP_2_MAIN_OPTIONS'
+  ]);
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +120,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes' as any, { event: '*', table: 'ads' } as any, (payload: any) => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -94,6 +155,55 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLanguageSelect = (lang: Language) => {
+    setSelectedLanguage(lang);
+    setUssdLogs(prev => [
+      ...prev,
+      `> LANGUAGE_SET: ${lang}`
+    ].slice(-10));
+  };
+
+  const handleUssdCancel = () => {
+    setUssdLogs(prev => [
+      ...prev,
+      `> SESSION_TERMINATED`
+    ].slice(-10));
+    setUssdInput('');
+  };
+
+  const handleUssdSend = () => {
+    const value = ussdInput.trim() || '1';
+    setUssdLogs(prev => [
+      ...prev,
+      `> INPUT_SENT: "${value}"`
+    ].slice(-10));
+    setUssdInput('');
+  };
+
+  const handleRefreshSession = () => {
+    setSelectedLanguage('ENGLISH');
+    setUssdLogs([
+      '> SESSION_START ID: 98221-UA',
+      '> POLLING GSM_NETWORK: OK',
+      '> HANDSHAKE *135#: SUCCESS',
+      '> RENDER_MENU: STEP_2_MAIN_OPTIONS'
+    ]);
+    setUssdInput('');
+  };
+
+  const handleDownloadLogs = () => {
+    const content = ussdLogs.join('\n');
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `agri-pulse-ussd-session-${Date.now()}.log`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleRefreshPrices = async () => {
@@ -199,22 +309,41 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">
+                          {USSD_MENU_HEADERS[selectedLanguage]}
+                        </p>
                         <ul className="text-xs space-y-2 uppercase">
-                          <li>1. Market Prices</li>
-                          <li>2. Post Advertisement</li>
-                          <li>3. Crop Diseases</li>
-                          <li>4. Weather Forecast</li>
-                          <li>5. Account Settings</li>
-                          <li>6. Help / Feedback</li>
+                          {USSD_MENU_ITEMS[selectedLanguage].map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
                         </ul>
                         <div className="mt-8">
-                          <div className="border-b-2 border-black w-full h-8 flex items-center">
-                            <span className="animate-pulse">|</span>
+                          <div className="border-b-2 border-black w-full h-8 flex items-center gap-1">
+                            <input
+                              aria-label="USSD input option"
+                              className="w-full bg-transparent border-none text-xs font-bold font-mono focus:ring-0 outline-none p-0 uppercase placeholder:text-gray-400"
+                              placeholder="Enter option..."
+                              value={ussdInput}
+                              onChange={e => setUssdInput(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') handleUssdSend();
+                              }}
+                            />
+                            {ussdInput === '' && <span className="animate-pulse font-bold text-xs" aria-hidden="true">|</span>}
                           </div>
                           <div className="flex justify-between mt-2">
-                            <button className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold">Cancel</button>
-                            <button className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase">Send</button>
+                            <button
+                              onClick={handleUssdCancel}
+                              className="bg-black text-white px-3 py-1 text-[10px] uppercase font-bold hover:bg-gray-800 transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleUssdSend}
+                              className="bg-accent text-black px-3 py-1 text-[10px] border-black border-2 font-black uppercase hover:bg-accent/80 transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none"
+                            >
+                              Send
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -238,22 +367,22 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {LANGUAGES_LIST.map((lang) => {
+                      const isActive = selectedLanguage === lang.id;
+                      return (
+                        <button
+                          key={lang.id}
+                          aria-pressed={isActive}
+                          onClick={() => handleLanguageSelect(lang.id)}
+                          className={`p-4 border-2 border-black transition-colors text-left flex flex-col cursor-pointer focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none ${
+                            isActive ? 'bg-accent text-black font-black' : 'bg-white text-black hover:bg-accent/20'
+                          }`}
+                        >
+                          <span className="font-bold block mb-1 uppercase tracking-wider">{lang.label}</span>
+                          <p className={`text-xs uppercase ${isActive ? 'text-black/70' : 'text-gray-500'}`}>{lang.desc}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -270,17 +399,26 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="bg-primary text-white p-6 border-2 border-black neo-shadow">
+                <div className="bg-primary text-white p-6 border-2 border-black neo-shadow" role="log" aria-live="polite">
                   <h4 className="font-bold uppercase text-accent mb-4 tracking-[0.2em] italic">DEBUG CONSOLE</h4>
                   <div className="font-mono text-xs space-y-1 opacity-80">
-                    <p>&gt; SESSION_START ID: 98221-UA</p>
-                    <p>&gt; POLLING GSM_NETWORK: OK</p>
-                    <p>&gt; HANDSHAKE *135#: SUCCESS</p>
-                    <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
+                    {ussdLogs.map((log, index) => (
+                      <p key={index}>{log}</p>
+                    ))}
                   </div>
-                  <div className="mt-6 flex gap-4">
-                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
-                    <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
+                  <div className="mt-6 flex gap-4 flex-wrap">
+                    <button
+                      onClick={handleRefreshSession}
+                      className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                    >
+                      REFRESH SESSION
+                    </button>
+                    <button
+                      onClick={handleDownloadLogs}
+                      className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                    >
+                      DOWNLOAD LOGS
+                    </button>
                   </div>
                 </div>
               </div>
