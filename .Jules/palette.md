@@ -1,0 +1,3 @@
+## 2026-08-09 - State-Synchronized USSD Simulator Enhancements
+**Learning:** Integrating high-contrast, state-driven visual mockups with centralized application state (like selectedLanguage and ussdLogs) provides immediate tactile feedback, making a mock USSD dialer feel incredibly realistic and delightful. Adding accessible features such as role="log" and aria-live="polite" to debug consoles ensures screen readers receive asynchronous simulation updates seamlessly.
+**Action:** Always replace visual-only mockup elements with semantic buttons and real input elements with proper focus indicator styles, and utilize specialized ARIA attributes like aria-pressed to communicate state transitions to assistive technologies.
