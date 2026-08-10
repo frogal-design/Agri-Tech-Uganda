@@ -1,0 +1,3 @@
+## 2025-03-06 - Interactive Simulators and Screen Reader Accessibility
+**Learning:** Mockups or simulators (such as a phone USSD screen) often fail screen-reader accessibility because interactive items are rendered as static elements or decorative divs. Replaced static language list grid divs with semantic `<button>` tags equipped with `aria-pressed`, custom focus-visible borders, and dynamic text logs marked with `role="log"` and `aria-live="polite"` to guarantee full assistive technology feedback.
+**Action:** Always map simulation controls to semantic buttons, use `aria-pressed` for selection states, and tag asynchronous log regions with polite ARIA live regions.
