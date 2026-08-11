@@ -1,0 +1,3 @@
+## 2025-03-04 - Interactive Localization & USSD Simulator Accessibility
+**Learning:** For simulations of key state changes (such as language selectors or mock devices), using interactive, semantic `<button>` inputs with proper `aria-pressed` states and dynamic log feeds (`role="log"`, `aria-live="polite"`) significantly enhances the cognitive utility and perceived value of the system for both regular users and screen reader devices.
+**Action:** Always map list collections dynamically, synchronizing immediate interactive actions (like mock typing or setting language) with central states, and provide proper ARIA roles for screen reader feedback regions.
