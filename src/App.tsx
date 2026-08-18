@@ -40,6 +40,8 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +61,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes' as any, { event: '*', table: 'ads' }, (payload: any) => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -152,9 +154,29 @@ export default function App() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center border-2 border-black bg-white px-3 h-10">
-            <Search size={18} className="text-black" />
-            <input aria-label="Search marketplace" className="border-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-48 placeholder:text-gray-400" placeholder="Search marketplace..." type="text" />
+          <div className="hidden md:flex items-center border-2 border-black bg-white px-3 h-10 gap-1">
+            <Search size={18} className="text-black shrink-0" />
+            <input
+              ref={searchInputRef}
+              aria-label="Search marketplace"
+              className="border-none focus:outline-none focus:ring-0 text-sm font-bold uppercase bg-transparent w-44 placeholder:text-gray-400"
+              placeholder="Search marketplace..."
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                aria-label="Clear search input"
+                onClick={() => {
+                  setSearchQuery('');
+                  searchInputRef.current?.focus();
+                }}
+                className="p-0.5 hover:bg-black hover:text-white transition-colors border border-transparent hover:border-black"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
           <button aria-label="Change language" className="h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors active:translate-y-0.5 border-black border-2 md:border-0">
             <Languages size={20} className="text-black" />
