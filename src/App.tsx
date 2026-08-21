@@ -59,7 +59,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -238,22 +238,22 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
+                    <button type="button" className="p-4 text-left border border-black hover:bg-accent focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none transition-colors group">
                       <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
                       <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" className="p-4 text-left border border-black hover:bg-accent focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none transition-colors">
                       <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
                       <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" className="p-4 text-left border border-black hover:bg-accent focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none transition-colors">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
                       <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
+                    </button>
+                    <button type="button" className="p-4 text-left border border-black hover:bg-accent focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none transition-colors">
                       <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
                       <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    </button>
                   </div>
                 </div>
 
@@ -617,31 +617,39 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
+      <nav aria-label="Main Navigation" className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
           onClick={() => setActiveTab('prices')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="Market Prices"
+          aria-current={activeTab === 'prices' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none focus-visible:z-10 ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <TrendingUp size={24} className={activeTab === 'prices' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
           onClick={() => setActiveTab('ads')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="Advertisements"
+          aria-current={activeTab === 'ads' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none focus-visible:z-10 ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <Ads size={24} className={activeTab === 'ads' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
           onClick={() => setActiveTab('ussd')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="USSD Simulator"
+          aria-current={activeTab === 'ussd' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none focus-visible:z-10 ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <USSD size={24} className={activeTab === 'ussd' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">USSD</span>
         </button>
         <button 
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="Farmer Profile"
+          aria-current={activeTab === 'profile' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none focus-visible:z-10 ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <User size={24} className={activeTab === 'profile' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Profile</span>
