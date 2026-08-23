@@ -32,8 +32,16 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+const LANGUAGES = [
+  { id: 'ENGLISH', label: 'ENGLISH', desc: 'Default System Language' },
+  { id: 'SWAHILI', label: 'SWAHILI', desc: 'Regional Standard' },
+  { id: 'LUGANDA', label: 'LUGANDA', desc: 'Central Region Dialect' },
+  { id: 'LUO', label: 'LUO', desc: 'Northern Region Dialect' },
+];
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState('ENGLISH');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +67,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -199,7 +207,7 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MENU ({selectedLanguage})</p>
                         <ul className="text-xs space-y-2 uppercase">
                           <li>1. Market Prices</li>
                           <li>2. Post Advertisement</li>
@@ -238,22 +246,23 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {LANGUAGES.map((lang) => {
+                      const isSelected = selectedLanguage === lang.id;
+                      return (
+                        <button
+                          key={lang.id}
+                          type="button"
+                          onClick={() => setSelectedLanguage(lang.id)}
+                          aria-pressed={isSelected}
+                          className={`p-4 text-left border-2 border-black transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none ${
+                            isSelected ? 'bg-accent font-black' : 'bg-white hover:bg-accent/50'
+                          }`}
+                        >
+                          <span className="font-bold block mb-1 uppercase tracking-wider">{lang.label}</span>
+                          <p className="text-xs text-gray-600 uppercase">{lang.desc}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
