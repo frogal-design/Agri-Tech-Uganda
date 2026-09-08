@@ -40,6 +40,7 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +60,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -424,12 +425,21 @@ export default function App() {
                 )}
               </AnimatePresence>
 
-              <section className="flex flex-wrap gap-4 mb-12">
-                <button className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest">All Listings</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Tractors</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Irrigation</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Fertilizer</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Livestock</button>
+              <section className="flex flex-wrap gap-4 mb-12" aria-label="Filter advertisements by category">
+                {['All', 'Maize', 'Rice', 'Beans', 'Coffee', 'Cattle', 'Tractors', 'Irrigation', 'Fertilizer', 'Livestock'].map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    aria-pressed={selectedCategory === cat}
+                    className={`border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest transition-colors ${
+                      selectedCategory === cat
+                        ? 'bg-black text-accent'
+                        : 'bg-white text-black hover:bg-accent'
+                    }`}
+                  >
+                    {cat === 'All' ? 'All Listings' : cat}
+                  </button>
+                ))}
               </section>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -438,12 +448,30 @@ export default function App() {
                     <Loader2 size={48} className="animate-spin mb-4" />
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
-                ) : ads.length === 0 ? (
-                  <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
-                    <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
-                  </div>
-                ) : (
-                  ads.map((ad, index) => (
+                ) : (() => {
+                  const filteredAds = selectedCategory === 'All'
+                    ? ads
+                    : ads.filter(ad => ad.category?.toLowerCase() === selectedCategory.toLowerCase());
+
+                  if (filteredAds.length === 0) {
+                    return (
+                      <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
+                        <p className="font-display text-2xl font-black uppercase text-black/40 mb-2">
+                          No active advertisements found {selectedCategory !== 'All' ? `in "${selectedCategory}"` : ''}
+                        </p>
+                        {selectedCategory !== 'All' && (
+                          <button
+                            onClick={() => setSelectedCategory('All')}
+                            className="mt-2 font-black uppercase text-xs underline hover:text-accent transition-colors"
+                          >
+                            Show All Listings
+                          </button>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  return filteredAds.map((ad, index) => (
                     <motion.div 
                       key={ad.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -489,8 +517,8 @@ export default function App() {
                         </div>
                       </div>
                     </motion.div>
-                  ))
-                )}
+                  ));
+                })()}
               </div>
             </motion.div>
           ) : activeTab === 'prices' ? (
