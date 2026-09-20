@@ -26,6 +26,14 @@ import { supabase } from './lib/supabase';
 import { Ad, MarketPrice } from './types';
 import { refreshMarketPrices } from './services/marketService';
 
+const INITIAL_MARKET_PRICES: MarketPrice[] = [
+  { id: '1', date: '2023-10-24', market: 'Kalerwe', variety: 'Maize Grain', grade: 'Grade 1', price: '1,200', change: '+5%', trend: 'up' },
+  { id: '2', date: '2023-10-24', market: 'Owino Market', variety: 'Supa Rice', grade: 'Super', price: '3,800', change: '0%', trend: 'stable' },
+  { id: '3', date: '2023-10-24', market: 'Mbarara Central', variety: 'Yellow Beans', grade: 'Grade 1', price: '2,800', change: '-2%', trend: 'down' },
+  { id: '4', date: '2023-10-24', market: 'Gulu Main Market', variety: 'Cassava Flour', grade: 'Grade 2', price: '1,500', change: '+3%', trend: 'up' },
+  { id: '5', date: '2023-10-24', market: 'Jinja Central', variety: 'Groundnuts (Red)', grade: 'Grade 1', price: '4,500', change: '0%', trend: 'stable' }
+];
+
 const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
 const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
 const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qYFfsS7J-Jr26daBwCALYk9cN1C1dKSSLaJnMxviFJ74NgDnxKLFLTkjjhmOzj5U-Whcxj8WxyK8cybSwWw3yWMDc-Xq35WFhQ51CSWzvP7VpMP3qoeB81susixmbszkj_4FKhQRS5-8UhWAjdLcd5Mix7aIglI8G_hy-1Cp12Ffa0NIEFaMbFtcEy2vReV3hwSNE4UNsgESQwSD8kbq9s8jpQHrqTDOXeU9lGWF_XOQHw_ue62RNMPSJnoxaQ5aim_q86a";
@@ -40,6 +48,7 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [priceSearchQuery, setPriceSearchQuery] = useState('');
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +68,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'ads' }, (payload: any) => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -77,6 +86,7 @@ export default function App() {
 
   const fetchInitialData = async () => {
     if (!supabase) {
+      setPrices(INITIAL_MARKET_PRICES);
       setLoading(false);
       return;
     }
@@ -87,10 +97,15 @@ export default function App() {
         supabase.from('market_prices').select('*').order('date', { ascending: false })
       ]);
 
-      if (adsRes.data) setAds(adsRes.data);
-      if (pricesRes.data) setPrices(pricesRes.data);
+      if (adsRes.data && adsRes.data.length > 0) setAds(adsRes.data);
+      if (pricesRes.data && pricesRes.data.length > 0) {
+        setPrices(pricesRes.data);
+      } else {
+        setPrices(INITIAL_MARKET_PRICES);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
+      setPrices(INITIAL_MARKET_PRICES);
     } finally {
       setLoading(false);
     }
@@ -108,6 +123,16 @@ export default function App() {
       setRefreshing(false);
     }
   };
+
+  const filteredPrices = prices.filter(p => {
+    if (!priceSearchQuery.trim()) return true;
+    const q = priceSearchQuery.toLowerCase();
+    return (
+      p.market.toLowerCase().includes(q) ||
+      p.variety.toLowerCase().includes(q) ||
+      p.grade.toLowerCase().includes(q)
+    );
+  });
 
   const handlePostAd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -529,7 +554,23 @@ export default function App() {
                     </button>
                     <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
                       <Search size={20} className="text-gray-400 mr-3" />
-                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                      <input
+                        aria-label="Search markets or crops"
+                        className="border-none focus:ring-0 w-64 font-bold text-sm bg-transparent outline-none"
+                        placeholder="Search markets or crops..."
+                        type="text"
+                        value={priceSearchQuery}
+                        onChange={e => setPriceSearchQuery(e.target.value)}
+                      />
+                      {priceSearchQuery && (
+                        <button
+                          aria-label="Clear market search"
+                          onClick={() => setPriceSearchQuery('')}
+                          className="ml-2 text-gray-400 hover:text-black focus-visible:ring-2 focus-visible:ring-black rounded p-0.5"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -551,12 +592,14 @@ export default function App() {
                          <tr>
                            <td colSpan={6} className="p-10 text-center opacity-20 font-black uppercase italic">Syncing with national markets...</td>
                          </tr>
-                      ) : prices.length === 0 ? (
+                      ) : filteredPrices.length === 0 ? (
                         <tr>
-                           <td colSpan={6} className="p-10 text-center opacity-20 font-black uppercase italic">Market price data currently unavailable</td>
+                           <td colSpan={6} className="p-10 text-center opacity-20 font-black uppercase italic">
+                             {priceSearchQuery ? `No market prices matching "${priceSearchQuery}"` : 'Market price data currently unavailable'}
+                           </td>
                          </tr>
                       ) : (
-                        prices.map((row, i) => (
+                        filteredPrices.map((row, i) => (
                           <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-accent/10 transition-colors`}>
                             <td className="p-4 border border-black/10 font-mono text-xs">{new Date(row.date).toLocaleDateString()}</td>
                             <td className="p-4 border border-black/10 font-black uppercase italic">{row.market}</td>
@@ -617,31 +660,39 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
+      <nav aria-label="Main Navigation" className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
           onClick={() => setActiveTab('prices')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="Wholesale Market Prices Tab"
+          aria-current={activeTab === 'prices' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <TrendingUp size={24} className={activeTab === 'prices' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
           onClick={() => setActiveTab('ads')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="Advertisements Tab"
+          aria-current={activeTab === 'ads' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <Ads size={24} className={activeTab === 'ads' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
           onClick={() => setActiveTab('ussd')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="USSD Simulator Tab"
+          aria-current={activeTab === 'ussd' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <USSD size={24} className={activeTab === 'ussd' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">USSD</span>
         </button>
         <button 
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          aria-label="Farmer Profile Tab"
+          aria-current={activeTab === 'profile' ? 'page' : undefined}
+          className={`flex flex-col items-center justify-center w-full h-full transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <User size={24} className={activeTab === 'profile' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Profile</span>
