@@ -40,6 +40,7 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [priceSearchQuery, setPriceSearchQuery] = useState('');
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +60,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -527,9 +528,25 @@ export default function App() {
                       <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
                       <span>{refreshing ? 'Searching...' : 'Refresh Live Prices'}</span>
                     </button>
-                    <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
-                      <Search size={20} className="text-gray-400 mr-3" />
-                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                    <div className="flex items-center border-2 border-black bg-white px-4 h-12 relative w-full md:w-auto">
+                      <Search size={20} className="text-gray-400 mr-3 flex-shrink-0" />
+                      <input
+                        aria-label="Search markets or crops"
+                        value={priceSearchQuery}
+                        onChange={(e) => setPriceSearchQuery(e.target.value)}
+                        className="border-none focus:ring-0 w-full md:w-64 font-bold text-sm bg-transparent outline-none pr-6"
+                        placeholder="Search markets or crops..."
+                        type="text"
+                      />
+                      {priceSearchQuery && (
+                        <button
+                          onClick={() => setPriceSearchQuery('')}
+                          aria-label="Clear market search"
+                          className="absolute right-3 p-1 hover:bg-gray-100 rounded transition-colors"
+                        >
+                          <X size={16} className="text-gray-600" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -555,8 +572,24 @@ export default function App() {
                         <tr>
                            <td colSpan={6} className="p-10 text-center opacity-20 font-black uppercase italic">Market price data currently unavailable</td>
                          </tr>
+                      ) : prices.filter(p =>
+                          p.market.toLowerCase().includes(priceSearchQuery.toLowerCase()) ||
+                          p.variety.toLowerCase().includes(priceSearchQuery.toLowerCase()) ||
+                          p.grade.toLowerCase().includes(priceSearchQuery.toLowerCase())
+                        ).length === 0 ? (
+                        <tr>
+                           <td colSpan={6} className="p-10 text-center text-gray-500 font-bold uppercase italic">
+                             No market prices found matching "{priceSearchQuery}"
+                           </td>
+                         </tr>
                       ) : (
-                        prices.map((row, i) => (
+                        prices
+                          .filter(p =>
+                            p.market.toLowerCase().includes(priceSearchQuery.toLowerCase()) ||
+                            p.variety.toLowerCase().includes(priceSearchQuery.toLowerCase()) ||
+                            p.grade.toLowerCase().includes(priceSearchQuery.toLowerCase())
+                          )
+                          .map((row, i) => (
                           <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-accent/10 transition-colors`}>
                             <td className="p-4 border border-black/10 font-mono text-xs">{new Date(row.date).toLocaleDateString()}</td>
                             <td className="p-4 border border-black/10 font-black uppercase italic">{row.market}</td>
