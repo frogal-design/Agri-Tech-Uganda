@@ -26,6 +26,13 @@ import { supabase } from './lib/supabase';
 import { Ad, MarketPrice } from './types';
 import { refreshMarketPrices } from './services/marketService';
 
+const INITIAL_MARKET_PRICES: MarketPrice[] = [
+  { id: '1', date: new Date().toISOString(), market: 'Kampala (Owino)', variety: 'Super Fine Maize', grade: 'Grade 1', price: '3,200', change: '+2.5%', trend: 'up' },
+  { id: '2', date: new Date().toISOString(), market: 'Mbarara Central', variety: 'Matooke (Highland)', grade: 'Standard', price: '25,000', change: '-1.2%', trend: 'down' },
+  { id: '3', date: new Date().toISOString(), market: 'Gulu Main Market', variety: 'Supa Rice', grade: 'Grade 1', price: '5,500', change: '0.0%', trend: 'stable' },
+  { id: '4', date: new Date().toISOString(), market: 'Jinja Market', variety: 'Yellow Beans', grade: 'Grade 2', price: '4,000', change: '+1.0%', trend: 'up' },
+];
+
 const farmerHandImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuCOPA740SJzgynJgr0QP8T_yTXcQynHwMjAcWsAgxvlBMLCwa8cmCgQLP1OG1UuHvzC3cqktKeO2Cz7nglZeey3VV6NJPpHk3gqpZoc4zTVi4BkfXis8WYFpJDhYIO6M66EToukULe8sEXLaSimyG0E3GWpWR6dJ9dVL7jr-M38JNSXVcKU4WISvFdO5r8heygAJRurx_u_Lx3PjUs7xAJpcJwK2Vh2yrV-K2rRkZqiBYzShXuiBdUvMxBIwggSzHTzkv7gIHW5zozQ";
 const tractorImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBDHCoDBnBeZvni36obMm5yAT9cqzxXT4XNgujAKCcTixMv8CruxarhXkUzk4Dg4DDOvvol7erMGGFxKP2ztiZ46NlzQaq7vTHlLzPhxcUoZKcp8t4tdtJ1NccU1uZshhXqSM8aWYP1hW-1K4FAgX1zvm6x0S4yna5GIr-qqXYx8QvEf_7_8xtLIPIrGVKdsQDL-Gbc3n3kye40_CS5BVV4tKSVQJWGe76PuR5XiOjP2Ag-JAuW7Ue6OcW3BlgGFDmAt2diiBdT8AHG";
 const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qYFfsS7J-Jr26daBwCALYk9cN1C1dKSSLaJnMxviFJ74NgDnxKLFLTkjjhmOzj5U-Whcxj8WxyK8cybSwWw3yWMDc-Xq35WFhQ51CSWzvP7VpMP3qoeB81susixmbszkj_4FKhQRS5-8UhWAjdLcd5Mix7aIglI8G_hy-1Cp12Ffa0NIEFaMbFtcEy2vReV3hwSNE4UNsgESQwSD8kbq9s8jpQHrqTDOXeU9lGWF_XOQHw_ue62RNMPSJnoxaQ5aim_q86a";
@@ -36,10 +43,17 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
+  const [priceSearchQuery, setPriceSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  const filteredPrices = prices.filter(row =>
+    row.market.toLowerCase().includes(priceSearchQuery.toLowerCase()) ||
+    row.variety.toLowerCase().includes(priceSearchQuery.toLowerCase()) ||
+    row.grade.toLowerCase().includes(priceSearchQuery.toLowerCase())
+  );
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +73,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -77,6 +91,7 @@ export default function App() {
 
   const fetchInitialData = async () => {
     if (!supabase) {
+      setPrices(INITIAL_MARKET_PRICES);
       setLoading(false);
       return;
     }
@@ -87,10 +102,15 @@ export default function App() {
         supabase.from('market_prices').select('*').order('date', { ascending: false })
       ]);
 
-      if (adsRes.data) setAds(adsRes.data);
-      if (pricesRes.data) setPrices(pricesRes.data);
+      if (adsRes.data && adsRes.data.length > 0) setAds(adsRes.data);
+      if (pricesRes.data && pricesRes.data.length > 0) {
+        setPrices(pricesRes.data);
+      } else {
+        setPrices(INITIAL_MARKET_PRICES);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
+      setPrices(INITIAL_MARKET_PRICES);
     } finally {
       setLoading(false);
     }
@@ -528,8 +548,24 @@ export default function App() {
                       <span>{refreshing ? 'Searching...' : 'Refresh Live Prices'}</span>
                     </button>
                     <div className="hidden md:flex items-center border-2 border-black bg-white px-4 h-12">
-                      <Search size={20} className="text-gray-400 mr-3" />
-                      <input className="border-none focus:ring-0 w-64 font-bold text-sm" placeholder="Search markets or crops..." type="text" />
+                      <Search size={20} className="text-gray-400 mr-3 shrink-0" />
+                      <input
+                        aria-label="Search markets or crops"
+                        value={priceSearchQuery}
+                        onChange={e => setPriceSearchQuery(e.target.value)}
+                        className="border-none focus:ring-0 w-64 font-bold text-sm bg-transparent outline-none"
+                        placeholder="Search markets or crops..."
+                        type="text"
+                      />
+                      {priceSearchQuery && (
+                        <button
+                          onClick={() => setPriceSearchQuery('')}
+                          aria-label="Clear market search"
+                          className="p-1 hover:bg-gray-100 rounded text-gray-500 focus-visible:ring-2 focus-visible:ring-black"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -555,8 +591,14 @@ export default function App() {
                         <tr>
                            <td colSpan={6} className="p-10 text-center opacity-20 font-black uppercase italic">Market price data currently unavailable</td>
                          </tr>
+                      ) : filteredPrices.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-10 text-center text-gray-500 font-bold uppercase">
+                            No market prices matching &quot;{priceSearchQuery}&quot;
+                          </td>
+                        </tr>
                       ) : (
-                        prices.map((row, i) => (
+                        filteredPrices.map((row, i) => (
                           <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-accent/10 transition-colors`}>
                             <td className="p-4 border border-black/10 font-mono text-xs">{new Date(row.date).toLocaleDateString()}</td>
                             <td className="p-4 border border-black/10 font-black uppercase italic">{row.market}</td>
