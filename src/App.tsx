@@ -40,6 +40,16 @@ export default function App() {
   const [showPostForm, setShowPostForm] = useState(false);
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const AD_CATEGORIES = ['All', 'Tractors', 'Irrigation', 'Fertilizer', 'Livestock'];
+
+  const filteredAds = selectedCategory === 'All'
+    ? ads
+    : ads.filter(ad =>
+        ad.category.toLowerCase() === selectedCategory.toLowerCase() ||
+        ad.title.toLowerCase().includes(selectedCategory.toLowerCase())
+      );
 
   // Form State
   const [newAd, setNewAd] = useState({
@@ -59,7 +69,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -425,11 +435,20 @@ export default function App() {
               </AnimatePresence>
 
               <section className="flex flex-wrap gap-4 mb-12">
-                <button className="bg-black text-accent border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest">All Listings</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Tractors</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Irrigation</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Fertilizer</button>
-                <button className="bg-white text-black border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest hover:bg-accent transition-colors">Livestock</button>
+                {AD_CATEGORIES.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    aria-pressed={selectedCategory === category}
+                    className={`${
+                      selectedCategory === category
+                        ? 'bg-black text-accent'
+                        : 'bg-white text-black hover:bg-accent'
+                    } border-2 border-black px-6 py-2 font-black uppercase text-sm tracking-widest transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none`}
+                  >
+                    {category === 'All' ? 'All Listings' : category}
+                  </button>
+                ))}
               </section>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -438,12 +457,16 @@ export default function App() {
                     <Loader2 size={48} className="animate-spin mb-4" />
                     <p className="font-display text-2xl font-black uppercase italic">Retrieving marketplace data...</p>
                   </div>
-                ) : ads.length === 0 ? (
+                ) : filteredAds.length === 0 ? (
                   <div className="md:col-span-12 text-center py-20 border-4 border-dashed border-black/10">
-                    <p className="font-display text-2xl font-black uppercase text-black/20">No active advertisements found</p>
+                    <p className="font-display text-2xl font-black uppercase text-black/20">
+                      {selectedCategory === 'All'
+                        ? 'No active advertisements found'
+                        : `No advertisements found for "${selectedCategory}"`}
+                    </p>
                   </div>
                 ) : (
-                  ads.map((ad, index) => (
+                  filteredAds.map((ad, index) => (
                     <motion.div 
                       key={ad.id}
                       initial={{ opacity: 0, y: 20 }}
