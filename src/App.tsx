@@ -41,6 +41,20 @@ export default function App() {
   const [posting, setPosting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // USSD State
+  const [selectedLanguage, setSelectedLanguage] = useState('ENGLISH');
+  const [ussdLogs, setUssdLogs] = useState<string[]>([
+    '> SESSION_START ID: 98221-UA',
+    '> POLLING GSM_NETWORK: OK',
+    '> HANDSHAKE *135#: SUCCESS',
+    '> RENDER_MENU: STEP_2_MAIN_OPTIONS'
+  ]);
+
+  const handleSelectLanguage = (lang: string) => {
+    setSelectedLanguage(lang);
+    setUssdLogs(prev => [...prev.slice(-3), `> LANGUAGE_SET: ${lang}`]);
+  };
+
   // Form State
   const [newAd, setNewAd] = useState({
     title: '',
@@ -238,22 +252,26 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {[
+                      { code: 'ENGLISH', name: 'ENGLISH', desc: 'Default System Language' },
+                      { code: 'SWAHILI', name: 'SWAHILI', desc: 'Regional Standard' },
+                      { code: 'LUGANDA', name: 'LUGANDA', desc: 'Central Region Dialect' },
+                      { code: 'LUO', name: 'LUO', desc: 'Northern Region Dialect' },
+                    ].map(lang => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => handleSelectLanguage(lang.code)}
+                        aria-pressed={selectedLanguage === lang.code}
+                        aria-label={`Select ${lang.name} language`}
+                        className={`p-4 border border-black text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${
+                          selectedLanguage === lang.code ? 'bg-accent font-black border-2' : 'bg-white hover:bg-accent/50'
+                        }`}
+                      >
+                        <span className="font-bold block mb-1 uppercase tracking-wider">{lang.name}</span>
+                        <p className="text-xs text-gray-600 uppercase">{lang.desc}</p>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -273,13 +291,23 @@ export default function App() {
                 <div className="bg-primary text-white p-6 border-2 border-black neo-shadow">
                   <h4 className="font-bold uppercase text-accent mb-4 tracking-[0.2em] italic">DEBUG CONSOLE</h4>
                   <div className="font-mono text-xs space-y-1 opacity-80">
-                    <p>&gt; SESSION_START ID: 98221-UA</p>
-                    <p>&gt; POLLING GSM_NETWORK: OK</p>
-                    <p>&gt; HANDSHAKE *135#: SUCCESS</p>
-                    <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
+                    {ussdLogs.map((log, idx) => (
+                      <p key={idx}>{log}</p>
+                    ))}
                   </div>
                   <div className="mt-6 flex gap-4">
-                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
+                    <button
+                      type="button"
+                      onClick={() => setUssdLogs([
+                        '> SESSION_START ID: 98221-UA',
+                        '> POLLING GSM_NETWORK: OK',
+                        '> HANDSHAKE *135#: SUCCESS',
+                        '> RENDER_MENU: STEP_2_MAIN_OPTIONS'
+                      ])}
+                      className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all"
+                    >
+                      REFRESH SESSION
+                    </button>
                     <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
                   </div>
                 </div>
