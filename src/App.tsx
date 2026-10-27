@@ -32,8 +32,66 @@ const pumpImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBgtKTX9qY
 const fertilizerImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBn1FrAE5Y3f-ZgUadxGLAmS5Cy77eW9zv1cc0yhRdFrp-2S6z1n5Uz1J7-YUcaVqcrOCbRqkhuI4dDtOjsoZfZSLmDMCWpKSsVppDrZl3aupkdOcIeWO9FhcqTuDwggbc_gphXsvMRtKRJPsbxEqGGFJS8bs_qjB72_NRu7sCDzyxy8rBsJsO0me7lrYtpdHC01EEEHOFfUdbK5Cp9kb9B8UjLFdFlyVYH7aF_UvcNIlSuX8bsDlMEivbtDXq4idhmK42E16bilovW";
 const marketImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAm2b0e01GajvVkDnDTfSUYpGbxt9ernAY17EvJU8vmhAgdj9UyaCl9oxQKIXkn8uantoqlYeVrxYG5Gtm1iWFzziCN6D-rKYnNHf8KTnLOFU3-9UL8wjJXoM4Jjve_H8j0AC8p60nHb7xZi2iVQ9BfYSK9CDsQE_atx04sL1_IINKz9FJkwbsVNUmrsbVOsesQWliB2Xefp5W8rTocbJvy0PjqqMHI3XD4sehvP5g9VqzUeR-LORnsQ1uzbkoNDfXCLiHK7YHftlaP";
 
+type Language = 'ENGLISH' | 'SWAHILI' | 'LUGANDA' | 'LUO';
+
+const USSD_MENU_HEADERS: Record<Language, string> = {
+  ENGLISH: 'AGRI-PULSE MAIN MENU',
+  SWAHILI: 'AGRI-PULSE ORODHA KUU',
+  LUGANDA: "AGRI-PULSE OLUKALALA LUKULU",
+  LUO: 'AGRI-PULSE YUB ME DUL'
+};
+
+const USSD_MENU_ITEMS: Record<Language, string[]> = {
+  ENGLISH: [
+    '1. Market Prices',
+    '2. Post Advertisement',
+    '3. Crop Diseases',
+    '4. Weather Forecast',
+    '5. Account Settings',
+    '6. Help / Feedback'
+  ],
+  SWAHILI: [
+    '1. Bei za Soko',
+    '2. Weka Tangazo',
+    '3. Magonjwa ya Mazao',
+    '4. Utabiri wa Hali ya Hewa',
+    '5. Mipangilio ya Akaunti',
+    '6. Msaada / Maoni'
+  ],
+  LUGANDA: [
+    "1. Ebbeeyi y'Ebyaguzi",
+    '2. Teekawo ekirango',
+    "3. Endwadde z'Ebirime",
+    "4. Enteekateeka y'Ebbanga",
+    "5. Enteekateeka y'Akawunti",
+    '6. Obuyambi / Ennonga'
+  ],
+  LUO: [
+    '1. Wel me Pur',
+    '2. Ket Lanyutu',
+    '3. Two me Anyigirime',
+    '4. Yub me Yamo',
+    '5. Yub me Akaunt',
+    '6. Kony / Gam'
+  ]
+};
+
+const LANGUAGES: { id: Language; label: string; description: string }[] = [
+  { id: 'ENGLISH', label: 'ENGLISH', description: 'Default System Language' },
+  { id: 'SWAHILI', label: 'SWAHILI', description: 'Regional Standard' },
+  { id: 'LUGANDA', label: 'LUGANDA', description: 'Central Region Dialect' },
+  { id: 'LUO', label: 'LUO', description: 'Northern Region Dialect' }
+];
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('ussd');
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('ENGLISH');
+  const [ussdLogs, setUssdLogs] = useState<string[]>([
+    '> SESSION_START ID: 98221-UA',
+    '> POLLING GSM_NETWORK: OK',
+    '> HANDSHAKE *135#: SUCCESS',
+    '> RENDER_MENU: STEP_2_MAIN_OPTIONS'
+  ]);
   const [ads, setAds] = useState<Ad[]>([]);
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +117,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -199,14 +257,11 @@ export default function App() {
                         DIALING *135#...
                       </div>
                       <div className="bg-white border-2 border-black p-4 flex-grow font-mono space-y-4">
-                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">AGRI-PULSE MAIN MENU</p>
+                        <p className="text-sm font-bold border-b border-black pb-2 mb-2 uppercase">{USSD_MENU_HEADERS[selectedLanguage]}</p>
                         <ul className="text-xs space-y-2 uppercase">
-                          <li>1. Market Prices</li>
-                          <li>2. Post Advertisement</li>
-                          <li>3. Crop Diseases</li>
-                          <li>4. Weather Forecast</li>
-                          <li>5. Account Settings</li>
-                          <li>6. Help / Feedback</li>
+                          {USSD_MENU_ITEMS[selectedLanguage].map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
                         </ul>
                         <div className="mt-8">
                           <div className="border-b-2 border-black w-full h-8 flex items-center">
@@ -238,22 +293,26 @@ export default function App() {
                     <h3 className="font-display text-2xl font-black uppercase tracking-tight">Language Initialization</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer group">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">ENGLISH</span>
-                      <p className="text-xs text-gray-500 uppercase">Default System Language</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">SWAHILI</span>
-                      <p className="text-xs text-gray-500 uppercase">Regional Standard</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUGANDA</span>
-                      <p className="text-xs text-gray-500 uppercase">Central Region Dialect</p>
-                    </div>
-                    <div className="p-4 border border-black hover:bg-accent transition-colors cursor-pointer">
-                      <span className="font-bold block mb-1 uppercase tracking-wider">LUO</span>
-                      <p className="text-xs text-gray-500 uppercase">Northern Region Dialect</p>
-                    </div>
+                    {LANGUAGES.map(lang => {
+                      const isSelected = selectedLanguage === lang.id;
+                      return (
+                        <button
+                          key={lang.id}
+                          type="button"
+                          aria-pressed={isSelected}
+                          onClick={() => {
+                            setSelectedLanguage(lang.id);
+                            setUssdLogs(prev => [...prev.slice(-8), `> LANGUAGE_SET: ${lang.id}`]);
+                          }}
+                          className={`p-4 border-2 border-black text-left transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:outline-none ${
+                            isSelected ? 'bg-accent font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white hover:bg-accent/30'
+                          }`}
+                        >
+                          <span className="font-bold block mb-1 uppercase tracking-wider">{lang.label}</span>
+                          <p className="text-xs text-gray-600 uppercase font-medium">{lang.description}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -272,15 +331,39 @@ export default function App() {
 
                 <div className="bg-primary text-white p-6 border-2 border-black neo-shadow">
                   <h4 className="font-bold uppercase text-accent mb-4 tracking-[0.2em] italic">DEBUG CONSOLE</h4>
-                  <div className="font-mono text-xs space-y-1 opacity-80">
-                    <p>&gt; SESSION_START ID: 98221-UA</p>
-                    <p>&gt; POLLING GSM_NETWORK: OK</p>
-                    <p>&gt; HANDSHAKE *135#: SUCCESS</p>
-                    <p>&gt; RENDER_MENU: STEP_2_MAIN_OPTIONS</p>
+                  <div className="font-mono text-xs space-y-1 opacity-80" role="log" aria-live="polite">
+                    {ussdLogs.map((log, idx) => (
+                      <p key={idx}>{log}</p>
+                    ))}
                   </div>
                   <div className="mt-6 flex gap-4">
-                    <button className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all">REFRESH SESSION</button>
-                    <button className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all">DOWNLOAD LOGS</button>
+                    <button
+                      type="button"
+                      onClick={() => setUssdLogs([
+                        '> SESSION_START ID: 98221-UA',
+                        '> POLLING GSM_NETWORK: OK',
+                        '> HANDSHAKE *135#: SUCCESS',
+                        '> RENDER_MENU: STEP_2_MAIN_OPTIONS'
+                      ])}
+                      className="bg-accent text-black font-black px-6 py-2 border-2 border-black hover:translate-x-1 hover:translate-y-1 transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                    >
+                      REFRESH SESSION
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const blob = new Blob([ussdLogs.join('\n')], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'ussd_session_logs.txt';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
+                      className="border-2 border-white text-white font-black px-6 py-2 hover:bg-white hover:text-black transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                    >
+                      DOWNLOAD LOGS
+                    </button>
                   </div>
                 </div>
               </div>
