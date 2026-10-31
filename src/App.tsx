@@ -59,7 +59,7 @@ export default function App() {
     // Subscribe to ads
     const adsSubscription = supabase
       .channel('public:ads')
-      .on('postgres_changes', { event: '*', table: 'ads' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ads' }, payload => {
         if (payload.eventType === 'INSERT') {
           setAds(prev => [payload.new as Ad, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
@@ -617,31 +617,39 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
+      <nav aria-label="Main Navigation" className="fixed bottom-0 left-0 w-full z-50 h-20 flex justify-around items-stretch bg-white border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
         <button 
+          aria-label="Wholesale Market Prices"
+          aria-current={activeTab === 'prices' ? 'page' : undefined}
           onClick={() => setActiveTab('prices')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${activeTab === 'prices' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <TrendingUp size={24} className={activeTab === 'prices' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Markets</span>
         </button>
         <button 
+          aria-label="Marketplace Advertisements"
+          aria-current={activeTab === 'ads' ? 'page' : undefined}
           onClick={() => setActiveTab('ads')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${activeTab === 'ads' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <Ads size={24} className={activeTab === 'ads' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Ads</span>
         </button>
         <button 
+          aria-label="USSD Offline Simulator"
+          aria-current={activeTab === 'ussd' ? 'page' : undefined}
           onClick={() => setActiveTab('ussd')}
-          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          className={`flex flex-col items-center justify-center w-full h-full border-r-2 border-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${activeTab === 'ussd' ? 'bg-accent text-black scale-100 font-bold' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <USSD size={24} className={activeTab === 'ussd' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">USSD</span>
         </button>
         <button 
+          aria-label="Farmer Profile"
+          aria-current={activeTab === 'profile' ? 'page' : undefined}
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
+          className={`flex flex-col items-center justify-center w-full h-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${activeTab === 'profile' ? 'bg-accent text-black scale-100' : 'text-gray-400 grayscale hover:bg-gray-50'}`}
         >
           <User size={24} className={activeTab === 'profile' ? 'fill-black' : ''} />
           <span className="font-display text-[10px] font-black uppercase mt-1">Profile</span>
