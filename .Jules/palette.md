@@ -1,0 +1,3 @@
+## 2026-11-04 - Interactive Localization in Simulator Mockups
+**Learning:** Static display cards representing configuration options (like language dialects in a simulator setup step) feel broken or unresponsive if clicking them produces no feedback. Converting them into semantic `<button>` elements with `aria-pressed` states and wiring them directly to the primary simulation display (and secondary debug logs) gives immediate tactile affirmation and makes the tool feel responsive and alive.
+**Action:** When designing or refining mockups and interactive simulators, ensure configuration panels are fully functional with accessible button semantics, explicit active/pressed indicators, and synchronize the primary display with secondary diagnostic/status feeds.
