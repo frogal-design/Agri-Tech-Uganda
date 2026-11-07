@@ -1,0 +1,3 @@
+## 2026-05-08 - Contextual Category Filtering & Empty State Reset Actions
+**Learning:** In Neo-brutalist marketplace interfaces with category pill filters, static mock buttons confuse users who expect them to filter listings dynamically. Providing `aria-pressed` toggle buttons combined with an explicit, contextual empty state ("No active advertisements found in [Category]") and an instant "View All Listings" reset button prevents dead-end navigation and immediately clarifies filter status to assistive tech.
+**Action:** When adding filter controls to list views, always pair interactive category buttons with `aria-pressed` states, accessible group labels, and a reset CTA inside filtered-out empty states.
