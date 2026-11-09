@@ -1,0 +1,3 @@
+## 2026-05-08 - Synchronizing Simulator Mockups with Interactive Configuration Controls
+**Learning:** In simulator-style interfaces (like the USSD terminal), static documentation cards that appear clickable (e.g. hover styles, pointer cursor) cause user friction and confusion if clicking them does nothing. Converting them to accessible toggle buttons (`aria-pressed`) and synchronizing both the visual mockup and technical live debug console creates immediate multi-modal confirmation.
+**Action:** Always check mockups for static state controls; wire them into centralized state with `aria-pressed`, keyboard focus styling, and audible/visual feedback loops.
